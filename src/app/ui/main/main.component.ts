@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { Polyline } from 'src/app/services/polyline.service';
+import { SVG } from 'src/app/services/svg.service';
 
 
 @Component({
@@ -13,8 +13,8 @@ export class MainComponent implements OnInit {
   polygon!: SVGPolygonElement;
   addNew: boolean = true;
 
-  constructor(public polyline: Polyline) { 
-    polyline = new Polyline();
+  constructor(public svg: SVG) { 
+    svg = new SVG();
   }
 
   ngOnInit(): void {
@@ -22,8 +22,8 @@ export class MainComponent implements OnInit {
 
   createPreviewPolygon(event: MouseEvent): void {
     if (this.started === true){
-      this.polyline.points = `${this.points.join(' ')}, ${event.clientX},${event.clientY}`;
-     this.polygon.setAttributeNS(null,'points',this.polyline.points); 
+      this.svg.points = `${this.points.join(' ')}, ${event.clientX},${event.clientY}`;
+     this.polygon.setAttributeNS(null,'points',this.svg.points); 
     }
   }
 
@@ -32,19 +32,20 @@ export class MainComponent implements OnInit {
 
     this.points.push(`${event.clientX},${event.clientY}`);
 
-    this.polyline.points = `${this.points.join(' ')}`;
+    this.svg.points = `${this.points.join(' ')}`;
+
     if(this.addNew === true){
       this.addNew = false;
-      this.polygon = this.polyline.createPolygone();
+      this.polygon = this.svg.createPolygone();
       document.querySelector('#_svg')!.appendChild(this.polygon);
-      this.polygon.setAttributeNS(null,'points',this.polyline.points); 
+      this.polygon.setAttributeNS(null,'points',this.svg.points); 
     }
   }
 
   finishDrawingPolygon(): void{
     this.started = false;
     this.points = [];
-    this.polyline = new Polyline();
+    this.svg = new SVG();
     this.addNew = true;
   }
 
@@ -52,8 +53,8 @@ export class MainComponent implements OnInit {
   onBackKeyPress(event: KeyboardEvent): void{
     if(event.key.toLowerCase() === 'backspace'){
       this.points.splice(this.points.length - 1, 1);
-      this.polyline.points = `${this.points.join(' ')}`;
-      this.polygon.setAttributeNS(null,'points',this.polyline.points);
+      this.svg.points = `${this.points.join(' ')}`;
+      this.polygon.setAttributeNS(null,'points',this.svg.points);
     }
   }
 }

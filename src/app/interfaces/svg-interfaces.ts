@@ -1,11 +1,4 @@
-export interface IPolyline{
-    points: string;
-    fill: string;
-    stroke: string;
-    strokeWidth: string;
-}
-
-export interface IPolygone{
+export interface IPolygon{
     points: string;
     fill: string;
     stroke: string;
