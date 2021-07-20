@@ -25,13 +25,18 @@ export class MainComponent implements OnInit {
 
   createPreviewElement(event: MouseEvent): void {
     if (this.started === true) {
+      // polygon
       if (this.svgElement === 'polygon') {
         this.svg.points = `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`;
         this.polygon.setAttributeNS(null, 'points', this.svg.points);
-      } else if (this.svgElement === 'circle') {
+      }
+      // circle
+      else if (this.svgElement === 'circle') {
         this.svg.r = Math.abs((event.offsetX - Number(this.svg.cx))).toString();
         this.circle.setAttributeNS(null, 'r', this.svg.r);
-      } else if (this.svgElement === 'ellipse') {
+      }
+      // ellipse
+      else if (this.svgElement === 'ellipse') {
         this.svg.rx = Math.abs((event.offsetX - Number(this.svg.cx))).toString();
         this.svg.ry = Math.abs((event.offsetY - Number(this.svg.cy))).toString();
         this.ellipse.setAttributeNS(null, 'rx', this.svg.rx);
@@ -94,7 +99,7 @@ export class MainComponent implements OnInit {
   }
 
   changeDrawingElement(): void {
-    if(this.addNew === false){
+    if (this.addNew === false) {
       if (document.querySelector('#_svg')!.childNodes.length > 0) {
         document.querySelector('#_svg')!.removeChild(document.querySelector('#_svg')!.childNodes[document.querySelector('#_svg')!.childNodes.length - 1]);
       }
