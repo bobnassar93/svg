@@ -10,9 +10,10 @@ export class SVG implements IEllipse, ICircle, IPolygon, IRectangle {
   strokeWidth: string = '1';
   cx!: string;
   cy!: string;
-  rx!: string;
-  ry!: string;
+  rx: string = '0';
+  ry: string = '0';
   r: string = '0';
+  rotate: string = '0';
   fillOpacity: string = '1';
   width!: string;
   height!: string;
@@ -38,5 +39,18 @@ export class SVG implements IEllipse, ICircle, IPolygon, IRectangle {
     circle.setAttributeNS(null, 'stroke-width', this.strokeWidth);
     circle.setAttributeNS(null, 'fill-opacity', this.fillOpacity);
     return circle;
+  }
+
+  createEllipse(): SVGEllipseElement {
+    const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    ellipse.setAttributeNS(null, 'cx', this.cx);
+    ellipse.setAttributeNS(null, 'cy', this.cy);
+    ellipse.setAttributeNS(null, 'rx', this.rx);
+    ellipse.setAttributeNS(null, 'ry', this.ry);
+    ellipse.setAttributeNS(null, 'fill', this.fill);
+    ellipse.setAttributeNS(null, 'stroke', this.stroke);
+    ellipse.setAttributeNS(null, 'stroke-width', this.strokeWidth);
+    ellipse.setAttributeNS(null, 'fill-opacity', this.fillOpacity);
+    return ellipse;
   }
 }

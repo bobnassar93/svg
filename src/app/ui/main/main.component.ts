@@ -32,7 +32,11 @@ export class MainComponent implements OnInit {
         this.svg.r = Math.abs((event.offsetX - Number(this.svg.cx))).toString();
         this.circle.setAttributeNS(null, 'r', this.svg.r);
       } else if (this.svgElement === 'ellipse') {
-
+        this.svg.rx = Math.abs((event.offsetX - Number(this.svg.cx))).toString();
+        this.svg.ry = Math.abs((event.offsetY - Number(this.svg.cy))).toString();
+        this.ellipse.setAttributeNS(null, 'rx', this.svg.rx);
+        this.ellipse.setAttributeNS(null, 'ry', this.svg.ry);
+        this.ellipse.setAttributeNS(null, 'transform', `rotate(${this.svg.rotate} ${this.svg.cx} ${this.svg.cy})`);
       }
     }
   }
@@ -66,7 +70,10 @@ export class MainComponent implements OnInit {
       }
       // Ellipse
       else if (this.svgElement === 'ellipse') {
-
+        this.svg.cx = event.offsetX.toString();
+        this.svg.cy = event.offsetY.toString();
+        this.ellipse = this.svg.createEllipse();
+        document.querySelector('#_svg')!.appendChild(this.ellipse);
       }
     }
   }
@@ -81,7 +88,18 @@ export class MainComponent implements OnInit {
 
   cancelDrawingElement(): void {
     this.finishDrawingElement();
-    document.querySelector('#_svg')!.removeChild(document.querySelector('#_svg')!.childNodes[document.querySelector('#_svg')!.childNodes.length - 1]);
+    if (document.querySelector('#_svg')!.childNodes.length > 0) {
+      document.querySelector('#_svg')!.removeChild(document.querySelector('#_svg')!.childNodes[document.querySelector('#_svg')!.childNodes.length - 1]);
+    }
+  }
+
+  changeDrawingElement(): void {
+    if(this.addNew === false){
+      if (document.querySelector('#_svg')!.childNodes.length > 0) {
+        document.querySelector('#_svg')!.removeChild(document.querySelector('#_svg')!.childNodes[document.querySelector('#_svg')!.childNodes.length - 1]);
+      }
+    }
+    this.finishDrawingElement();
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -90,38 +108,67 @@ export class MainComponent implements OnInit {
       this.points.splice(this.points.length - 1, 1);
       this.svg.points = `${this.points.join(' ')}`;
       this.polygon.setAttributeNS(null, 'points', this.svg.points);
-    }else if (event.key.toLowerCase() === 'escape'){
+    } else if (event.key.toLowerCase() === 'escape') {
       this.cancelDrawingElement();
     }
   }
 
   @HostListener('document:wheel', ['$event'])
   onMouseWheelScroll(event: WheelEvent): void {
-    if(this.started === true){
-      if(this.svgElement === 'polygon'){
+    if (this.started === true) {
+      if (this.svgElement === 'polygon') {
         let fillOpacity = Number(this.polygon.getAttributeNS(null, 'fill-opacity'));
-      if (Math.sign(event.deltaY) === -1) {
-        if (fillOpacity < 1) {
-          this.polygon.setAttributeNS(null, 'fill-opacity', (fillOpacity+=.1).toFixed(1));
-        }
-      }else{
-        if(fillOpacity > 0){
-          this.polygon.setAttributeNS(null, 'fill-opacity', (fillOpacity-=.1).toFixed(1));
-        }
-      }
-      }
-      else if(this.svgElement === 'circle'){
-      let fillOpacity = Number(this.circle.getAttributeNS(null, 'fill-opacity'));
-      if (Math.sign(event.deltaY) === -1) {
-        if (fillOpacity < 1) {
-          this.circle.setAttributeNS(null, 'fill-opacity', (fillOpacity+=.1).toFixed(1));
-        }
-      }else{
-        if(fillOpacity > 0){
-          this.circle.setAttributeNS(null, 'fill-opacity', (fillOpacity-=.1).toFixed(1));
+        if (Math.sign(event.deltaY) === -1) {
+          if (fillOpacity < 1) {
+            this.polygon.setAttributeNS(null, 'fill-opacity', (fillOpacity += .1).toFixed(1));
+          }
+        } else {
+          if (fillOpacity > 0) {
+            this.polygon.setAttributeNS(null, 'fill-opacity', (fillOpacity -= .1).toFixed(1));
+          }
         }
       }
-     }
+      else if (this.svgElement === 'circle') {
+        let fillOpacity = Number(this.circle.getAttributeNS(null, 'fill-opacity'));
+        if (Math.sign(event.deltaY) === -1) {
+          if (fillOpacity < 1) {
+            this.circle.setAttributeNS(null, 'fill-opacity', (fillOpacity += .1).toFixed(1));
+          }
+        } else {
+          if (fillOpacity > 0) {
+            this.circle.setAttributeNS(null, 'fill-opacity', (fillOpacity -= .1).toFixed(1));
+          }
+        }
+      }
+      else if (this.svgElement === 'ellipse') {
+        let fillOpacity = Number(this.ellipse.getAttributeNS(null, 'fill-opacity'));
+        if (Math.sign(event.deltaY) === -1) {
+          if (event.altKey) {
+            let rotate = Number(this.svg.rotate);
+            if (event.shiftKey) {
+              this.svg.rotate = (rotate -= 10).toString();
+            } else {
+              this.svg.rotate = (--rotate).toString();
+            }
+            this.ellipse.setAttributeNS(null, 'transform', `rotate(${this.svg.rotate} ${this.svg.cx} ${this.svg.cy})`);
+          } else if (fillOpacity < 1) {
+            this.ellipse.setAttributeNS(null, 'fill-opacity', (fillOpacity += .1).toFixed(1));
+          }
+
+        } else {
+          if (event.altKey) {
+            let rotate = Number(this.svg.rotate);
+            if (event.shiftKey) {
+              this.svg.rotate = (rotate += 10).toString();
+            } else {
+              this.svg.rotate = (++rotate).toString();
+            }
+            this.ellipse.setAttributeNS(null, 'transform', `rotate(${this.svg.rotate} ${this.svg.cx} ${this.svg.cy})`);
+          } else if (fillOpacity > 0) {
+            this.ellipse.setAttributeNS(null, 'fill-opacity', (fillOpacity -= .1).toFixed(1));
+          }
+        }
+      }
     }
   }
 }
