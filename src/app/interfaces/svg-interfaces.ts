@@ -3,6 +3,7 @@ export interface IPolygon{
     fill: string;
     stroke: string;
     strokeWidth: string;
+    fillOpacity: string;
 }
 
 export interface IRectangle{
@@ -20,6 +21,7 @@ export interface ICircle{
     stroke: string;
     strokeWidth: string;
     fill: string;
+    fillOpacity: string;
 }
 
 export interface IEllipse{

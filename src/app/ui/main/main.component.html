@@ -1,2 +1,19 @@
-<svg id='_svg' (mousemove)="createPreviewPolygon($event)" (click)="addNewPoints($event)"
-(dblclick)="finishDrawingPolygon()"></svg>
+<div class="container-fluid">
+    <div class="form-check form-check-inline">
+        <input [(ngModel)]="svgElement" class="form-check-input" type="radio" name="inlineRadioOptions" value="polygon"
+            id="polygon">
+        <label class="form-check-label" for="polygon">Polygon</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input [(ngModel)]="svgElement" class="form-check-input" type="radio" name="inlineRadioOptions" value="circle"
+            id="circle">
+        <label class="form-check-label" for="circle">Circle</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input [(ngModel)]="svgElement" class="form-check-input" type="radio" name="inlineRadioOptions" value="ellipse"
+            id="ellipse">
+        <label class="form-check-label" for="ellipse">Ellipse</label>
+    </div>
+</div>
+<svg id='_svg' (mousemove)="createPreviewElement($event)" (click)="addNewPoints($event)"
+    (dblclick)="finishDrawingElement()"></svg>
