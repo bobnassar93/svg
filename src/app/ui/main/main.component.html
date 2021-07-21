@@ -1,19 +1,20 @@
 <div class="container-fluid">
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElement" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="polygon"
+        <input [(ngModel)]="svgElementType" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="polygon"
             id="polygon">
         <label class="form-check-label" for="polygon">Polygon</label>
     </div>
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElement" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="circle"
+        <input [(ngModel)]="svgElementType" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="circle"
             id="circle">
         <label class="form-check-label" for="circle">Circle</label>
     </div>
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElement" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="ellipse"
+        <input [(ngModel)]="svgElementType" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="ellipse"
             id="ellipse">
         <label class="form-check-label" for="ellipse">Ellipse</label>
     </div>
 </div>
+<app-menu id="menu" *ngIf='showMenu'></app-menu>
 <svg id='_svg' (mousemove)="createPreviewElement($event)" (click)="addNewPoints($event)"
     (dblclick)="finishDrawingElement()"></svg>

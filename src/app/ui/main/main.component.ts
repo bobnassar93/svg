@@ -10,12 +10,10 @@ import { SVG } from 'src/app/services/svg.service';
 export class MainComponent implements OnInit {
   started: boolean = false;
   points: string[] = [];
-  polygon!: SVGPolygonElement;
-  circle!: SVGCircleElement;
-  ellipse!: SVGEllipseElement;
+  svgElement!: SVGPolygonElement | SVGCircleElement | SVGEllipseElement;
   addNew: boolean = true;
-  svgElement: string = 'polygon';
-
+  svgElementType: string = 'polygon';
+  showMenu: boolean = false;
   constructor(public svg: SVG) {
   }
 
@@ -26,31 +24,35 @@ export class MainComponent implements OnInit {
   createPreviewElement(event: MouseEvent): void {
     if (this.started === true) {
       // polygon
-      if (this.svgElement === 'polygon') {
+      if (this.svgElementType === 'polygon') {
         this.svg.points = `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`;
-        this.polygon.setAttributeNS(null, 'points', this.svg.points);
+        this.svgElement.setAttributeNS(null, 'points', this.svg.points);
       }
       // circle
-      else if (this.svgElement === 'circle') {
+      else if (this.svgElementType === 'circle') {
         this.svg.r = Math.abs((event.offsetX - Number(this.svg.cx))).toString();
-        this.circle.setAttributeNS(null, 'r', this.svg.r);
+        this.svgElement.setAttributeNS(null, 'r', this.svg.r);
       }
       // ellipse
-      else if (this.svgElement === 'ellipse') {
+      else if (this.svgElementType === 'ellipse') {
         this.svg.rx = Math.abs((event.offsetX - Number(this.svg.cx))).toString();
         this.svg.ry = Math.abs((event.offsetY - Number(this.svg.cy))).toString();
-        this.ellipse.setAttributeNS(null, 'rx', this.svg.rx);
-        this.ellipse.setAttributeNS(null, 'ry', this.svg.ry);
-        this.ellipse.setAttributeNS(null, 'transform', `rotate(${this.svg.rotate} ${this.svg.cx} ${this.svg.cy})`);
+        this.svgElement.setAttributeNS(null, 'rx', this.svg.rx);
+        this.svgElement.setAttributeNS(null, 'ry', this.svg.ry);
+        this.svgElement.setAttributeNS(null, 'transform', `rotate(${this.svg.rotate} ${this.svg.cx} ${this.svg.cy})`);
       }
     }
   }
 
   addNewPoints(event: MouseEvent): void {
+    if(this.showMenu){
+      this.showMenu = false;
+      return;
+    }
     this.started = true;
     document.body.style.overflow = 'hidden';
 
-    if (this.svgElement === 'polygon') {
+    if (this.svgElementType === 'polygon') {
       this.points.push(`${event.offsetX},${event.offsetY}`);
 
       this.svg.points = `${this.points.join(' ')}`;
@@ -60,25 +62,106 @@ export class MainComponent implements OnInit {
       this.addNew = false;
 
       // Polygon
-      if (this.svgElement === 'polygon') {
+      if (this.svgElementType === 'polygon') {
 
-        this.polygon = this.svg.createPolygone();
-        document.querySelector('#_svg')!.appendChild(this.polygon);
-        this.polygon.setAttributeNS(null, 'points', this.svg.points);
+        this.svgElement = this.svg.createPolygone();
+        document.querySelector('#_svg')!.appendChild(this.svgElement);
+        this.svgElement.setAttributeNS(null, 'points', this.svg.points);
+        this.svgElement.addEventListener('contextmenu', (ev) => {
+          ev.preventDefault();
+          this.showMenu = true;
+          setTimeout(() => {
+            const innerW = window.innerWidth;
+            const innerH = window.innerHeight;
+            const menu = document.querySelector('#menu')! as HTMLElement;
+            menu.style.display = 'block';
+  
+            console.log(menu.style.width);
+            if (((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth + 30)) && ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight + 30))) {
+              menu.style.top = `${ev.pageY - menu.firstElementChild!.clientHeight}px`;
+              menu.style.left = `${ev.pageX - menu.firstElementChild!.clientWidth}px`;
+            }
+            else if ((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth + 30)) {
+              menu.style.top = `${ev.pageY}px`;
+              menu.style.left = `${ev.pageX - menu.firstElementChild!.clientWidth}px`;
+            } else if ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight + 30)) {
+              menu.style.top = `${ev.pageY - menu.firstElementChild!.clientHeight}px`;
+              menu.style.left = `${ev.pageX}px`;
+            }
+            else {
+              menu.style.top = `${ev.pageY}px`;
+              menu.style.left = `${ev.pageX}px`;
+            }
+          }, 50);
+        });
       }
       // Circle
-      else if (this.svgElement === 'circle') {
+      else if (this.svgElementType === 'circle') {
         this.svg.cx = event.offsetX.toString();
         this.svg.cy = event.offsetY.toString();
-        this.circle = this.svg.createCircle();
-        document.querySelector('#_svg')!.appendChild(this.circle);
+        this.svgElement = this.svg.createCircle();
+        document.querySelector('#_svg')!.appendChild(this.svgElement);
+        this.svgElement.addEventListener('contextmenu', (ev) => {
+          ev.preventDefault();
+          this.showMenu = true;
+          setTimeout(() => {
+            const innerW = window.innerWidth;
+            const innerH = window.innerHeight;
+            const menu = document.querySelector('#menu')! as HTMLElement;
+            menu.style.display = 'block';
+  
+            console.log(menu.style.width);
+            if (((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth + 30)) && ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight + 30))) {
+              menu.style.top = `${ev.pageY - menu.firstElementChild!.clientHeight}px`;
+              menu.style.left = `${ev.pageX - menu.firstElementChild!.clientWidth}px`;
+            }
+            else if ((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth + 30)) {
+              menu.style.top = `${ev.pageY}px`;
+              menu.style.left = `${ev.pageX - menu.firstElementChild!.clientWidth}px`;
+            } else if ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight + 30)) {
+              menu.style.top = `${ev.pageY - menu.firstElementChild!.clientHeight}px`;
+              menu.style.left = `${ev.pageX}px`;
+            }
+            else {
+              menu.style.top = `${ev.pageY}px`;
+              menu.style.left = `${ev.pageX}px`;
+            }
+          }, 50);
+        });
       }
       // Ellipse
-      else if (this.svgElement === 'ellipse') {
+      else if (this.svgElementType === 'ellipse') {
         this.svg.cx = event.offsetX.toString();
         this.svg.cy = event.offsetY.toString();
-        this.ellipse = this.svg.createEllipse();
-        document.querySelector('#_svg')!.appendChild(this.ellipse);
+        this.svgElement = this.svg.createEllipse();
+        document.querySelector('#_svg')!.appendChild(this.svgElement);
+        this.svgElement.addEventListener('contextmenu', (ev) => {
+          ev.preventDefault();
+          this.showMenu = true;
+          setTimeout(() => {
+            const innerW = window.innerWidth;
+            const innerH = window.innerHeight;
+            const menu = document.querySelector('#menu')! as HTMLElement;
+            menu.style.display = 'block';
+  
+            console.log(menu.style.width);
+            if (((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth + 30)) && ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight + 30))) {
+              menu.style.top = `${ev.pageY - menu.firstElementChild!.clientHeight}px`;
+              menu.style.left = `${ev.pageX - menu.firstElementChild!.clientWidth}px`;
+            }
+            else if ((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth + 30)) {
+              menu.style.top = `${ev.pageY}px`;
+              menu.style.left = `${ev.pageX - menu.firstElementChild!.clientWidth}px`;
+            } else if ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight + 30)) {
+              menu.style.top = `${ev.pageY - menu.firstElementChild!.clientHeight}px`;
+              menu.style.left = `${ev.pageX}px`;
+            }
+            else {
+              menu.style.top = `${ev.pageY}px`;
+              menu.style.left = `${ev.pageX}px`;
+            }
+          }, 50);
+        });
       }
     }
   }
@@ -112,7 +195,7 @@ export class MainComponent implements OnInit {
     if (event.key.toLowerCase() === 'backspace') {
       this.points.splice(this.points.length - 1, 1);
       this.svg.points = `${this.points.join(' ')}`;
-      this.polygon.setAttributeNS(null, 'points', this.svg.points);
+      this.svgElement.setAttributeNS(null, 'points', this.svg.points);
     } else if (event.key.toLowerCase() === 'escape') {
       this.cancelDrawingElement();
     }
@@ -121,32 +204,32 @@ export class MainComponent implements OnInit {
   @HostListener('document:wheel', ['$event'])
   onMouseWheelScroll(event: WheelEvent): void {
     if (this.started === true) {
-      if (this.svgElement === 'polygon') {
-        let fillOpacity = Number(this.polygon.getAttributeNS(null, 'fill-opacity'));
+      if (this.svgElementType === 'polygon') {
+        let fillOpacity = Number(this.svgElement.getAttributeNS(null, 'fill-opacity'));
         if (Math.sign(event.deltaY) === -1) {
           if (fillOpacity < 1) {
-            this.polygon.setAttributeNS(null, 'fill-opacity', (fillOpacity += .1).toFixed(1));
+            this.svgElement.setAttributeNS(null, 'fill-opacity', (fillOpacity += .1).toFixed(1));
           }
         } else {
           if (fillOpacity > 0) {
-            this.polygon.setAttributeNS(null, 'fill-opacity', (fillOpacity -= .1).toFixed(1));
+            this.svgElement.setAttributeNS(null, 'fill-opacity', (fillOpacity -= .1).toFixed(1));
           }
         }
       }
-      else if (this.svgElement === 'circle') {
-        let fillOpacity = Number(this.circle.getAttributeNS(null, 'fill-opacity'));
+      else if (this.svgElementType === 'circle') {
+        let fillOpacity = Number(this.svgElement.getAttributeNS(null, 'fill-opacity'));
         if (Math.sign(event.deltaY) === -1) {
           if (fillOpacity < 1) {
-            this.circle.setAttributeNS(null, 'fill-opacity', (fillOpacity += .1).toFixed(1));
+            this.svgElement.setAttributeNS(null, 'fill-opacity', (fillOpacity += .1).toFixed(1));
           }
         } else {
           if (fillOpacity > 0) {
-            this.circle.setAttributeNS(null, 'fill-opacity', (fillOpacity -= .1).toFixed(1));
+            this.svgElement.setAttributeNS(null, 'fill-opacity', (fillOpacity -= .1).toFixed(1));
           }
         }
       }
-      else if (this.svgElement === 'ellipse') {
-        let fillOpacity = Number(this.ellipse.getAttributeNS(null, 'fill-opacity'));
+      else if (this.svgElementType === 'ellipse') {
+        let fillOpacity = Number(this.svgElement.getAttributeNS(null, 'fill-opacity'));
         if (Math.sign(event.deltaY) === -1) {
           if (event.altKey) {
             let rotate = Number(this.svg.rotate);
@@ -155,9 +238,9 @@ export class MainComponent implements OnInit {
             } else {
               this.svg.rotate = (--rotate).toString();
             }
-            this.ellipse.setAttributeNS(null, 'transform', `rotate(${this.svg.rotate} ${this.svg.cx} ${this.svg.cy})`);
+            this.svgElement.setAttributeNS(null, 'transform', `rotate(${this.svg.rotate} ${this.svg.cx} ${this.svg.cy})`);
           } else if (fillOpacity < 1) {
-            this.ellipse.setAttributeNS(null, 'fill-opacity', (fillOpacity += .1).toFixed(1));
+            this.svgElement.setAttributeNS(null, 'fill-opacity', (fillOpacity += .1).toFixed(1));
           }
 
         } else {
@@ -168,9 +251,9 @@ export class MainComponent implements OnInit {
             } else {
               this.svg.rotate = (++rotate).toString();
             }
-            this.ellipse.setAttributeNS(null, 'transform', `rotate(${this.svg.rotate} ${this.svg.cx} ${this.svg.cy})`);
+            this.svgElement.setAttributeNS(null, 'transform', `rotate(${this.svg.rotate} ${this.svg.cx} ${this.svg.cy})`);
           } else if (fillOpacity > 0) {
-            this.ellipse.setAttributeNS(null, 'fill-opacity', (fillOpacity -= .1).toFixed(1));
+            this.svgElement.setAttributeNS(null, 'fill-opacity', (fillOpacity -= .1).toFixed(1));
           }
         }
       }
