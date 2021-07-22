@@ -1,37 +1,33 @@
-export interface IPolygon{
-    points: string;
+export interface commonAttributes {
     fill: string;
     stroke: string;
     strokeWidth: string;
     fillOpacity: string;
+    type: string;
 }
 
-export interface IRectangle{
+export interface IPolygon extends commonAttributes{
+    points: string;
+}
+
+export interface IRectangle extends commonAttributes{
     width: string;
     height: string;
-    fill: string;
-    stroke: string;
-    strokeWidth: string;
 }
 
-export interface ICircle{
+export interface ICircle extends commonAttributes{
     cx: string;
     cy: string;
     r: string;
-    stroke: string;
-    strokeWidth: string;
-    fill: string;
-    fillOpacity: string;
 }
 
-export interface IEllipse{
+export interface IEllipse extends commonAttributes{
     cx: string;
     cy: string;
     rx: string;
     ry: string;
-    stroke: string;
-    strokeWidth: string;
-    fill: string;
+    rotate: string;
+    transform: string;
 }
 
 export interface IText{

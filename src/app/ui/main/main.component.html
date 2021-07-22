@@ -1,20 +1,44 @@
 <div class="container-fluid">
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElementType" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="polygon"
+        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input" type="radio" name="inlineRadioOptions" value="polygon"
             id="polygon">
         <label class="form-check-label" for="polygon">Polygon</label>
     </div>
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElementType" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="circle"
+        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input" type="radio" name="inlineRadioOptions" value="circle"
             id="circle">
         <label class="form-check-label" for="circle">Circle</label>
     </div>
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElementType" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="ellipse"
+        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input" type="radio" name="inlineRadioOptions" value="ellipse"
             id="ellipse">
         <label class="form-check-label" for="ellipse">Ellipse</label>
     </div>
 </div>
-<app-menu id="menu" *ngIf='showMenu'></app-menu>
-<svg id='_svg' (mousemove)="createPreviewElement($event)" (click)="addNewPoints($event)"
-    (dblclick)="finishDrawingElement()"></svg>
+<app-menu id="menu" *ngIf="showMenu"></app-menu>
+<svg id="_svg" (mousemove)="createPreviewElement($event)" (click)="addNewPoints($event)"
+    (dblclick)="finishDrawingElement()" xmlns="http://www.w3.org/2000/svg">
+    <ng-container *ngFor="let element of svgElements; let i = index">
+       <ng-container [ngSwitch]="element.type">
+
+        <!-- Polygon -->
+        <polygon *ngSwitchCase="'polygon'" [attr.points]="element.points" [attr.fill]="element.fill"
+        [attr.stroke]="element.stroke" [attr.stroke-width]="element.strokeWidth" [attr.fill-opacity]="element.fillOpacity" [attr.data-index]="i"
+        (contextmenu)="onElementContextMenu($event, element)"/>
+
+        <!-- Circle -->
+        <circle *ngSwitchCase="'circle'" [attr.cx]="element.cx" [attr.cy]="element.cy" [attr.r]="element.r" [attr.points]="element.points"
+        [attr.fill]="element.fill" [attr.stroke]="element.stroke" [attr.stroke-width]="element.strokeWidth"
+        [attr.fill-opacity]="element.fillOpacity" [attr.data-index]="i"
+        (contextmenu)="onElementContextMenu($event, element)"/>
+
+        <!-- Ellipse -->
+        <ellipse *ngSwitchCase="'ellipse'" [attr.cx]="element.cx" [attr.cy]="element.cy" [attr.rx]="element.rx" [attr.ry]="element.ry"
+        [attr.fill]="element.fill" [attr.stroke]="element.stroke"
+        [attr.stroke-width]="element.strokeWidth" [attr.fill-opacity]="element.fillOpacity" [attr.transform]="element.transform" [attr.data-index]="i"
+        (contextmenu)="onElementContextMenu($event, element)"/>
+       </ng-container>
+    </ng-container>
+    
+    
+</svg>

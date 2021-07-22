@@ -3,54 +3,59 @@ import { ICircle, IEllipse, IPolygon, IRectangle } from '../interfaces/svg-inter
 @Injectable({
   providedIn: 'root'
 })
-export class SVG implements IEllipse, ICircle, IPolygon, IRectangle {
-  points: string = '';
-  fill: string = 'lime';
-  stroke: string = 'red';
-  strokeWidth: string = '1';
-  cx!: string;
-  cy!: string;
-  rx: string = '0';
-  ry: string = '0';
-  r: string = '0';
-  rotate: string = '0';
-  fillOpacity: string = '1';
-  width!: string;
-  height!: string;
+export class SVG {
+  polygon!: IPolygon;
+  ellipse!: IEllipse;
+  circle!: ICircle;
+  rectangle!: IRectangle;
 
   constructor() {
   }
 
-  createPolygone(): SVGPolygonElement {
-    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    polygon.setAttributeNS(null, 'points', this.points);
-    polygon.setAttribute('style', `fill:${this.fill};stroke:${this.stroke};stroke-width:${this.strokeWidth}`);
-    polygon.setAttributeNS(null, 'fill-opacity', this.fillOpacity);
-    return polygon;
+  createPolygone(fill: string, fillOpacity: string, points: string,
+    stroke: string, strokeWidth: string, type: string): IPolygon {
+      this.polygon = {
+        fill,
+        fillOpacity,
+        points,
+        stroke,
+        strokeWidth,
+        type
+      };
+    return this.polygon;
   }
 
-  createCircle(): SVGCircleElement {
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttributeNS(null, 'cx', this.cx);
-    circle.setAttributeNS(null, 'cy', this.cy);
-    circle.setAttributeNS(null, 'r', this.r);
-    circle.setAttributeNS(null, 'fill', this.fill);
-    circle.setAttributeNS(null, 'stroke', this.stroke);
-    circle.setAttributeNS(null, 'stroke-width', this.strokeWidth);
-    circle.setAttributeNS(null, 'fill-opacity', this.fillOpacity);
-    return circle;
+  createCircle(fill: string, fillOpacity: string, cx: string, cy: string, r: string,
+    stroke: string, strokeWidth: string, type: string): ICircle {
+      this.circle = {
+        cx,
+        cy,
+        fill,
+        fillOpacity,
+        r,
+        stroke,
+        strokeWidth,
+        type
+      }
+    return this.circle;
   }
 
-  createEllipse(): SVGEllipseElement {
-    const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-    ellipse.setAttributeNS(null, 'cx', this.cx);
-    ellipse.setAttributeNS(null, 'cy', this.cy);
-    ellipse.setAttributeNS(null, 'rx', this.rx);
-    ellipse.setAttributeNS(null, 'ry', this.ry);
-    ellipse.setAttributeNS(null, 'fill', this.fill);
-    ellipse.setAttributeNS(null, 'stroke', this.stroke);
-    ellipse.setAttributeNS(null, 'stroke-width', this.strokeWidth);
-    ellipse.setAttributeNS(null, 'fill-opacity', this.fillOpacity);
-    return ellipse;
+  createEllipse(fill: string, fillOpacity: string, cx: string, cy: string, rx: string, ry: string,
+    stroke: string, strokeWidth: string, type: string, rotate: string, transform: string): IEllipse {
+    this.ellipse = {
+      cx,
+      cy,
+      fill,
+      fillOpacity,
+      rotate,
+      rx,
+      ry,
+      stroke,
+      strokeWidth,
+      type,
+      transform
+    }
+
+    return this.ellipse;
   }
 }
