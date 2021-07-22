@@ -1,20 +1,67 @@
 <div class="container-fluid">
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElementType" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="polygon"
-            id="polygon">
-        <label class="form-check-label" for="polygon">Polygon</label>
+        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input pointer" type="radio"
+            name="inlineRadioOptions" value="polygon" id="polygon">
+        <label class="form-check-label pointer" for="polygon">Polygon</label>
     </div>
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElementType" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="circle"
-            id="circle">
-        <label class="form-check-label" for="circle">Circle</label>
+        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input pointer" type="radio"
+            name="inlineRadioOptions" value="circle" id="circle">
+        <label class="form-check-label pointer" for="circle">Circle</label>
     </div>
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElementType" (change)='changeDrawingElement()' class="form-check-input" type="radio" name="inlineRadioOptions" value="ellipse"
-            id="ellipse">
-        <label class="form-check-label" for="ellipse">Ellipse</label>
+        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input pointer" type="radio"
+            name="inlineRadioOptions" value="ellipse" id="ellipse">
+        <label class="form-check-label pointer" for="ellipse">Ellipse</label>
     </div>
 </div>
-<app-menu id="menu" *ngIf='showMenu'></app-menu>
-<svg id='_svg' (mousemove)="createPreviewElement($event)" (click)="addNewPoints($event)"
-    (dblclick)="finishDrawingElement()"></svg>
+<app-menu id="menu" *ngIf="showMenu" [type]="type" [rotation]="rotationValue" [opacity]="opacity"
+[strokeColor]="strokeColor" [strokeWidth]="strokeWidth" [fillColor]="fillColor"
+    (changeElementFillColor)="changeElementFillColorEmitReceiver($event.ev, $event.property)"></app-menu>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteElementPrompt" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="deleteElementPromptLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="staticBackdropLabel">Are you sure you want to delete the following element ?
+                </h6>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-danger" (click)="removeElement()"
+                    data-bs-dismiss="modal">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<svg (mousemove)="createPreviewElement($event)" (click)="addNewPoints($event)" (dblclick)="finishDrawingElement()"
+    xmlns="http://www.w3.org/2000/svg">
+    <ng-container *ngFor="let element of svgElements; let i = index">
+        <ng-container [ngSwitch]="element.type">
+
+            <!-- Polygon -->
+            <polygon *ngSwitchCase="'polygon'" [attr.points]="element.points" [attr.fill]="element.fill"
+                [attr.stroke]="element.stroke" [attr.stroke-width]="element.strokeWidth"
+                [attr.fill-opacity]="element.fillOpacity" [attr.data-index]="i"
+                (contextmenu)="onElementContextMenu($event, i)" />
+
+            <!-- Circle -->
+            <circle *ngSwitchCase="'circle'" [attr.cx]="element.cx" [attr.cy]="element.cy" [attr.r]="element.r"
+                [attr.points]="element.points" [attr.fill]="element.fill" [attr.stroke]="element.stroke"
+                [attr.stroke-width]="element.strokeWidth" [attr.fill-opacity]="element.fillOpacity"
+                [attr.data-index]="i" (contextmenu)="onElementContextMenu($event, i)" />
+
+            <!-- Ellipse -->
+            <ellipse *ngSwitchCase="'ellipse'" [attr.cx]="element.cx" [attr.cy]="element.cy" [attr.rx]="element.rx"
+                [attr.ry]="element.ry" [attr.fill]="element.fill" [attr.stroke]="element.stroke"
+                [attr.stroke-width]="element.strokeWidth" [attr.fill-opacity]="element.fillOpacity"
+                [attr.transform]="element.transform" [attr.data-index]="i"
+                (contextmenu)="onElementContextMenu($event, i)" />
+        </ng-container>
+    </ng-container>
+
+
+</svg>
