@@ -30,7 +30,6 @@ export class MenuComponent implements OnInit {
 
   changeElementFillColorEmitter(ev: Event, property: string): void{
     this.changeElementFillColor.emit({ev, property});
-    console.log(this.type);
   }
 
 }

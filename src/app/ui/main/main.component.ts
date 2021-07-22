@@ -30,7 +30,7 @@ export class MainComponent implements OnInit {
     this.deleteElementModal = document.getElementById('deleteElementPrompt')!;
     this.deleteElementModal.addEventListener('show.bs.modal', () => {
       this.showMenu = false;
-    })
+    });
   }
 
   createPreviewElement(event: MouseEvent): void {
@@ -61,6 +61,7 @@ export class MainComponent implements OnInit {
       this.showMenu = false;
       return;
     }
+
     this.userStartedDrawing = true;
     document.body.style.overflow = 'hidden';
 
@@ -144,6 +145,7 @@ export class MainComponent implements OnInit {
             this.svg.polygon.fillOpacity = (fillOpacity += .1).toFixed(1);
           }
         } else {
+
           if (fillOpacity > 0) {
             this.svg.polygon.fillOpacity = (fillOpacity -= .1).toFixed(1);
           }
@@ -163,6 +165,7 @@ export class MainComponent implements OnInit {
             this.svg.circle.fillOpacity = (fillOpacity -= .1).toFixed(1);
           }
         }
+
         this.svgElements[this.svgElements.length - 1] = this.svg.circle;
       }
       else if (this.svgElementType === 'ellipse') {
@@ -211,13 +214,9 @@ export class MainComponent implements OnInit {
   }
 
   onElementContextMenu(ev: MouseEvent, index: number): void {
-
     ev.preventDefault();
-
     this.showMenu = true;
-
     this.elementIndex = index;
-
     setTimeout(() => {
       const innerW = window.innerWidth;
       const innerH = window.innerHeight;
@@ -277,6 +276,10 @@ export class MainComponent implements OnInit {
 
   removeElement(): void {
     this.svgElements.splice(this.elementIndex, 1);
+  }
+
+  saveChanges(): void {
+    console.log(JSON.stringify(this.svgElements));
   }
 }
 
