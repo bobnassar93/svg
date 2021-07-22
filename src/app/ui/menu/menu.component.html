@@ -1,5 +1,41 @@
 <ul class="dropdown-menu context-menu">
-    <li class="dropdown-item">Fill Color: <input type="color"></li>
-    <li><button class="dropdown-item" type="button">Another action</button></li>
-    <li><button class="dropdown-item" type="button">Something else here</button></li>
+    <!-- Fill Color -->
+    <li class="dropdown-item">
+        <label class="form-label" for="fillColor">Fill Color:</label>
+        <input type="color" (input)="changeElementFillColorEmitter($event, 'fillColor')" id="fillColor"
+            class="form-control p-0" [(ngModel)]="fillColor">
+    </li>
+    <!-- Opacity -->
+    <li class="dropdown-item">
+        <label for="opacity" class="form-label">Opacity:</label>
+        <input type="range" min="0" max="1" step=".01" class="form-range" id="opacity"
+            (input)="changeElementFillColorEmitter($event, 'opacity')" [(ngModel)]="opacity">
+    </li>
+    <!-- Stroke Color -->
+    <li class="dropdown-item">
+        <label class="form-label" for="strokeColor">Stroke Color:</label>
+        <input type="color" (input)="changeElementFillColorEmitter($event, 'strokeColor')" id="strokeColor"
+            class="form-control p-0" [(ngModel)]="strokeColor">
+    </li>
+    <!-- Stroke Width -->
+    <li class="dropdown-item">
+        <label for="strokeWidth" class="form-label">Stroke Width:</label>
+        <input type="range" min="0" max="20" step="1" class="form-range" id="strokeWidth"
+            (input)="changeElementFillColorEmitter($event, 'strokeWidth')" [(ngModel)]="strokeWidth">
+    </li>
+    <!-- Rotation -->
+    <li class="dropdown-item" *ngIf="type === 'ellipse'">
+        <label for="rotation" class="form-label">Rotation:</label>
+        <input type="range" min="0" max="360" step="1" class="form-range" id="rotation"
+            (input)="changeElementFillColorEmitter($event, 'rotation')" [(ngModel)]="rotation">
+    </li>
+    <li>
+        <hr class="dropdown-divider">
+    </li>
+    <li class="ps-2 pe-2">
+        <div class="d-grid">
+            <button class="btn btn-outline-danger" data-bs-toggle="modal"
+                data-bs-target="#deleteElementPrompt">Delete</button>
+        </div>
+    </li>
 </ul>

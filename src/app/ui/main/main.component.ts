@@ -1,5 +1,4 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { ICircle, IEllipse, IPolygon, IRectangle } from 'src/app/interfaces/svg-interfaces';
 import { SVG } from 'src/app/services/svg.service';
 
 
@@ -11,17 +10,27 @@ import { SVG } from 'src/app/services/svg.service';
 export class MainComponent implements OnInit {
   userStartedDrawing: boolean = false;
   points: string[] = [];
-  svgElement!: SVGPolygonElement | SVGCircleElement | SVGEllipseElement;
   isAddingNew: boolean = true;
   svgElementType: string = 'polygon';
   showMenu: boolean = false;
-  elementBeingEdited!: any;
+  elementIndex!: number;
   svgElements: (any)[] = [];
+  deleteElementModal!: HTMLElement;
+  rotationValue!: string;
+  fillColor!: string;
+  opacity!: string;
+  strokeColor!: string;
+  strokeWidth!: string;
+  type!: string;
 
   constructor(public svg: SVG) {
   }
 
   ngOnInit(): void {
+    this.deleteElementModal = document.getElementById('deleteElementPrompt')!;
+    this.deleteElementModal.addEventListener('show.bs.modal', () => {
+      this.showMenu = false;
+    })
   }
 
   createPreviewElement(event: MouseEvent): void {
@@ -57,11 +66,11 @@ export class MainComponent implements OnInit {
 
     if (this.svgElementType === 'polygon') {
       this.points.push(`${event.offsetX},${event.offsetY}`);
-      this.svg.polygon = this.svg.createPolygone('lime', '1', `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`, 'red', '1', 'polygon');
+      this.svg.polygon = this.svg.createPolygone('#51ff00', '1', `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`, '#f20707', '1', 'polygon');
     } else if (this.svgElementType === 'circle') {
-      this.svg.circle = this.svg.createCircle('lime', '1', event.offsetX.toString(), event.offsetY.toString(), '1', 'red', '1', 'circle');
+      this.svg.circle = this.svg.createCircle('#51ff00', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '#f20707', '1', 'circle');
     } else if (this.svgElementType === 'ellipse') {
-      this.svg.ellipse = this.svg.createEllipse('lime', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '1', 'red', '1', 'ellipse', '0', '');
+      this.svg.ellipse = this.svg.createEllipse('#51ff00', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '1', '#f20707', '1', 'ellipse', '0', '');
     }
 
     if (this.isAddingNew === true) {
@@ -89,11 +98,14 @@ export class MainComponent implements OnInit {
     this.svg = new SVG();
     this.isAddingNew = true;
     document.body.style.overflow = 'auto';
+    this.showMenu = false;
   }
 
   cancelDrawingElement(): void {
+    if (this.userStartedDrawing === true) {
+      this.svgElements.pop();
+    }
     this.finishDrawingElement();
-    this.svgElements.pop();
   }
 
   changeDrawingElement(): void {
@@ -118,6 +130,7 @@ export class MainComponent implements OnInit {
       }
     } else if (event.key.toLowerCase() === 'escape') {
       this.cancelDrawingElement();
+      this.showMenu = false;
     }
   }
 
@@ -165,6 +178,10 @@ export class MainComponent implements OnInit {
             } else {
               this.svg.ellipse.rotate = (--rotate).toString();
             }
+            if (Number(this.svg.ellipse.rotate) < 0) {
+              this.svg.ellipse.rotate = '360';
+            }
+
             this.svg.ellipse.transform = `rotate(${this.svg.ellipse.rotate} ${this.svg.ellipse.cx} ${this.svg.ellipse.cy})`;
 
           } else if (fillOpacity < 1) {
@@ -179,6 +196,9 @@ export class MainComponent implements OnInit {
             } else {
               this.svg.ellipse.rotate = (++rotate).toString();
             }
+            if (Number(this.svg.ellipse.rotate) > 360) {
+              this.svg.ellipse.rotate = '0';
+            }
             this.svg.ellipse.transform = `rotate(${this.svg.ellipse.rotate} ${this.svg.ellipse.cx} ${this.svg.ellipse.cy})`;
           } else if (fillOpacity > 0) {
             this.svg.ellipse.fillOpacity = (fillOpacity -= .1).toFixed(1);
@@ -190,11 +210,13 @@ export class MainComponent implements OnInit {
     }
   }
 
-  onElementContextMenu(ev: MouseEvent, element: any): void {
+  onElementContextMenu(ev: MouseEvent, index: number): void {
+
     ev.preventDefault();
+
     this.showMenu = true;
 
-    this.elementBeingEdited = element;
+    this.elementIndex = index;
 
     setTimeout(() => {
       const innerW = window.innerWidth;
@@ -202,15 +224,14 @@ export class MainComponent implements OnInit {
       const menu = document.querySelector('#menu')! as HTMLElement;
       menu.style.display = 'block';
 
-      console.log(menu.style.width);
-      if (((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth + 30)) && ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight + 30))) {
+      if (((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth)) && ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight))) {
         menu.style.top = `${ev.pageY - menu.firstElementChild!.clientHeight}px`;
         menu.style.left = `${ev.pageX - menu.firstElementChild!.clientWidth}px`;
       }
-      else if ((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth + 30)) {
+      else if ((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth)) {
         menu.style.top = `${ev.pageY}px`;
         menu.style.left = `${ev.pageX - menu.firstElementChild!.clientWidth}px`;
-      } else if ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight + 30)) {
+      } else if ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight)) {
         menu.style.top = `${ev.pageY - menu.firstElementChild!.clientHeight}px`;
         menu.style.left = `${ev.pageX}px`;
       }
@@ -218,7 +239,44 @@ export class MainComponent implements OnInit {
         menu.style.top = `${ev.pageY}px`;
         menu.style.left = `${ev.pageX}px`;
       }
+
+      this.fillColor = this.svgElements[this.elementIndex].fill;
+      this.opacity = this.svgElements[this.elementIndex].fillOpacity;
+      this.strokeColor = this.svgElements[this.elementIndex].stroke;
+      this.strokeWidth = this.svgElements[this.elementIndex].strokeWidth;
+      this.type = this.svgElements[this.elementIndex].type;
+
+      if (this.svgElementType === 'ellipse') {
+        this.rotationValue = this.svgElements[this.elementIndex].rotate;
+      }
     }, 50);
+  }
+
+  changeElementFillColorEmitReceiver(ev: Event, property: string): void {
+    const target = ev.target! as HTMLInputElement;
+    const svgElement = this.svgElements[this.elementIndex];
+
+    switch (property) {
+      case 'fillColor':
+        svgElement.fill = target.value;
+        break;
+      case 'strokeColor':
+        svgElement.stroke = target.value;
+        break;
+      case 'opacity':
+        svgElement.fillOpacity = target.value;
+        break;
+      case 'rotation':
+        svgElement.transform = `rotate(${target.value} ${svgElement.cx} ${svgElement.cy})`;
+        break;
+      case 'strokeWidth':
+        svgElement.strokeWidth = target.value;
+        break;
+    }
+  }
+
+  removeElement(): void {
+    this.svgElements.splice(this.elementIndex, 1);
   }
 }
 
