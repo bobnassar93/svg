@@ -8,21 +8,22 @@ import { SVG } from 'src/app/services/svg.service';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit {
-  started: boolean = false;
+  userStartedDrawing: boolean = false;
   points: string[] = [];
   svgElement!: SVGPolygonElement | SVGCircleElement | SVGEllipseElement;
-  addNew: boolean = true;
+  isAddingNew: boolean = true;
   svgElementType: string = 'polygon';
   showMenu: boolean = false;
+  elementBeingEdited!: EventTarget;
+
   constructor(public svg: SVG) {
   }
 
   ngOnInit(): void {
-    this.svg = new SVG();
   }
 
   createPreviewElement(event: MouseEvent): void {
-    if (this.started === true) {
+    if (this.userStartedDrawing === true) {
       // polygon
       if (this.svgElementType === 'polygon') {
         this.svg.points = `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`;
@@ -49,7 +50,7 @@ export class MainComponent implements OnInit {
       this.showMenu = false;
       return;
     }
-    this.started = true;
+    this.userStartedDrawing = true;
     document.body.style.overflow = 'hidden';
 
     if (this.svgElementType === 'polygon') {
@@ -58,8 +59,8 @@ export class MainComponent implements OnInit {
       this.svg.points = `${this.points.join(' ')}`;
     }
 
-    if (this.addNew === true) {
-      this.addNew = false;
+    if (this.isAddingNew === true) {
+      this.isAddingNew = false;
 
       // Polygon
       if (this.svgElementType === 'polygon') {
@@ -70,6 +71,9 @@ export class MainComponent implements OnInit {
         this.svgElement.addEventListener('contextmenu', (ev) => {
           ev.preventDefault();
           this.showMenu = true;
+
+          this.elementBeingEdited = ev.target!;
+
           setTimeout(() => {
             const innerW = window.innerWidth;
             const innerH = window.innerHeight;
@@ -104,6 +108,9 @@ export class MainComponent implements OnInit {
         this.svgElement.addEventListener('contextmenu', (ev) => {
           ev.preventDefault();
           this.showMenu = true;
+
+          this.elementBeingEdited = ev.target!;
+
           setTimeout(() => {
             const innerW = window.innerWidth;
             const innerH = window.innerHeight;
@@ -138,6 +145,9 @@ export class MainComponent implements OnInit {
         this.svgElement.addEventListener('contextmenu', (ev) => {
           ev.preventDefault();
           this.showMenu = true;
+
+          this.elementBeingEdited = ev.target!;
+
           setTimeout(() => {
             const innerW = window.innerWidth;
             const innerH = window.innerHeight;
@@ -167,10 +177,10 @@ export class MainComponent implements OnInit {
   }
 
   finishDrawingElement(): void {
-    this.started = false;
+    this.userStartedDrawing = false;
     this.points = [];
     this.svg = new SVG();
-    this.addNew = true;
+    this.isAddingNew = true;
     document.body.style.overflow = 'auto';
   }
 
@@ -182,7 +192,7 @@ export class MainComponent implements OnInit {
   }
 
   changeDrawingElement(): void {
-    if (this.addNew === false) {
+    if (this.isAddingNew === false) {
       if (document.querySelector('#_svg')!.childNodes.length > 0) {
         document.querySelector('#_svg')!.removeChild(document.querySelector('#_svg')!.childNodes[document.querySelector('#_svg')!.childNodes.length - 1]);
       }
@@ -203,7 +213,7 @@ export class MainComponent implements OnInit {
 
   @HostListener('document:wheel', ['$event'])
   onMouseWheelScroll(event: WheelEvent): void {
-    if (this.started === true) {
+    if (this.userStartedDrawing === true) {
       if (this.svgElementType === 'polygon') {
         let fillOpacity = Number(this.svgElement.getAttributeNS(null, 'fill-opacity'));
         if (Math.sign(event.deltaY) === -1) {
