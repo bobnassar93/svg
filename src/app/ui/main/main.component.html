@@ -1,22 +1,25 @@
 <div class="container-fluid">
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input pointer" type="radio"
-            name="inlineRadioOptions" value="polygon" id="polygon">
+        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input pointer"
+            type="radio" name="inlineRadioOptions" value="polygon" id="polygon">
         <label class="form-check-label pointer" for="polygon">Polygon</label>
     </div>
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input pointer" type="radio"
-            name="inlineRadioOptions" value="circle" id="circle">
+        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input pointer"
+            type="radio" name="inlineRadioOptions" value="circle" id="circle">
         <label class="form-check-label pointer" for="circle">Circle</label>
     </div>
     <div class="form-check form-check-inline">
-        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input pointer" type="radio"
-            name="inlineRadioOptions" value="ellipse" id="ellipse">
+        <input [(ngModel)]="svgElementType" (change)="changeDrawingElement()" class="form-check-input pointer"
+            type="radio" name="inlineRadioOptions" value="ellipse" id="ellipse">
         <label class="form-check-label pointer" for="ellipse">Ellipse</label>
     </div>
+    <button class="btn btn-outline-success m-1" (click)="saveChanges()">Save</button>
 </div>
+
+<!-- Context Menu -->
 <app-menu id="menu" *ngIf="showMenu" [type]="type" [rotation]="rotationValue" [opacity]="opacity"
-[strokeColor]="strokeColor" [strokeWidth]="strokeWidth" [fillColor]="fillColor"
+    [strokeColor]="strokeColor" [strokeWidth]="strokeWidth" [fillColor]="fillColor"
     (changeElementFillColor)="changeElementFillColorEmitReceiver($event.ev, $event.property)"></app-menu>
 
 <!-- Modal -->
@@ -37,11 +40,11 @@
     </div>
 </div>
 
+<!-- SVG -->
 <svg (mousemove)="createPreviewElement($event)" (click)="addNewPoints($event)" (dblclick)="finishDrawingElement()"
     xmlns="http://www.w3.org/2000/svg">
     <ng-container *ngFor="let element of svgElements; let i = index">
         <ng-container [ngSwitch]="element.type">
-
             <!-- Polygon -->
             <polygon *ngSwitchCase="'polygon'" [attr.points]="element.points" [attr.fill]="element.fill"
                 [attr.stroke]="element.stroke" [attr.stroke-width]="element.strokeWidth"
@@ -62,6 +65,4 @@
                 (contextmenu)="onElementContextMenu($event, i)" />
         </ng-container>
     </ng-container>
-
-
 </svg>
