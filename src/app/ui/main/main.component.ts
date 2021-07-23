@@ -358,7 +358,7 @@ export class MainComponent implements OnInit {
       this.startDragging = true;
       this.cancelDrawingElement();
       this.svg.animateCSS(ev.target as HTMLElement, 'flash');
-    }, 500);
+    }, 250);
   }
 
   stopDragging(): void {
