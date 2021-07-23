@@ -41,7 +41,7 @@
 </div>
 
 <!-- SVG -->
-<svg (mousemove)="createPreviewElement($event)" (mousedown)="prepareForDragging($event)" (mousemove)="drag($event)"
+<svg (mousemove)="createPreviewElement($event); drag($event)" (mousedown)="prepareForDragging($event)"
     (mouseup)="stopDragging()" (click)="addNewPoints($event)" (dblclick)="finishDrawingElement()"
     xmlns="http://www.w3.org/2000/svg" [style]="{'background-image': 'url(' + _url + ')'}" [attr.width]="_w"
     [attr.height]="_h">
