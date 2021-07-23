@@ -41,7 +41,8 @@
 </div>
 
 <!-- SVG -->
-<svg (mousemove)="createPreviewElement($event)" (click)="addNewPoints($event)" (dblclick)="finishDrawingElement()"
+<svg (mousemove)="createPreviewElement($event)" (mousedown)="prepareForDragging($event)" (mousemove)="drag($event)"
+    (mouseup)="stopDragging()" (click)="addNewPoints($event)" (dblclick)="finishDrawingElement()"
     xmlns="http://www.w3.org/2000/svg" [style]="{'background-image': 'url(' + _url + ')'}" [attr.width]="_w"
     [attr.height]="_h">
     <ng-container *ngFor="let element of svgElements; let i = index">
@@ -66,5 +67,4 @@
                 (contextmenu)="onElementContextMenu($event, i)" />
         </ng-container>
     </ng-container>
-
 </svg>
