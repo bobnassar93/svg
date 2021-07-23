@@ -12,35 +12,35 @@ export class SVG {
   constructor() {
   }
 
-  createPolygone(fill: string, fillOpacity: string, points: string,
+  createPolygone(fill: string, fillOpacity: string = '1', points: string,
     stroke: string, strokeWidth: string, type: string): IPolygon {
-      this.polygon = {
-        fill,
-        fillOpacity,
-        points,
-        stroke,
-        strokeWidth,
-        type
-      };
+    this.polygon = {
+      fill,
+      fillOpacity,
+      points,
+      stroke,
+      strokeWidth,
+      type
+    };
     return this.polygon;
   }
 
-  createCircle(fill: string, fillOpacity: string, cx: string, cy: string, r: string,
+  createCircle(fill: string, fillOpacity: string = '1', cx: string, cy: string, r: string,
     stroke: string, strokeWidth: string, type: string): ICircle {
-      this.circle = {
-        cx,
-        cy,
-        fill,
-        fillOpacity,
-        r,
-        stroke,
-        strokeWidth,
-        type
-      }
+    this.circle = {
+      cx,
+      cy,
+      fill,
+      fillOpacity,
+      r,
+      stroke,
+      strokeWidth,
+      type
+    }
     return this.circle;
   }
 
-  createEllipse(fill: string, fillOpacity: string, cx: string, cy: string, rx: string, ry: string,
+  createEllipse(fill: string, fillOpacity: string = '1', cx: string, cy: string, rx: string, ry: string,
     stroke: string, strokeWidth: string, type: string, rotate: string, transform: string): IEllipse {
     this.ellipse = {
       cx,

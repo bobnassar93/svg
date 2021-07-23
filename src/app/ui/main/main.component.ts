@@ -22,6 +22,9 @@ export class MainComponent implements OnInit {
   strokeColor!: string;
   strokeWidth!: string;
   type!: string;
+  _url: string = '';
+  _w: number = window.innerWidth;
+  _h: number = window.innerHeight;
 
   constructor(public svg: SVG) {
   }
@@ -31,6 +34,37 @@ export class MainComponent implements OnInit {
     this.deleteElementModal.addEventListener('show.bs.modal', () => {
       this.showMenu = false;
     });
+
+    document.addEventListener('dragenter', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+    }, false);
+    document.addEventListener('dragleave', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+    }, false);
+    document.addEventListener('dragover', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+    }, false);
+    document.addEventListener('drop', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      let dt = ev.dataTransfer!;
+      let files = dt.files;
+
+      let reader = new FileReader()
+      reader.readAsDataURL(files[0]);
+      reader.onloadend = () => {
+        const img = new Image();
+        img.src = reader.result!.toString();
+        img.onload = () => {
+          this._w = img.width;
+          this._h = img.height;
+          this._url = img.src;
+        }
+      }
+    }, false);
   }
 
   createPreviewElement(event: MouseEvent): void {
@@ -67,11 +101,23 @@ export class MainComponent implements OnInit {
 
     if (this.svgElementType === 'polygon') {
       this.points.push(`${event.offsetX},${event.offsetY}`);
-      this.svg.polygon = this.svg.createPolygone('#51ff00', '1', `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`, '#f20707', '1', 'polygon');
+      if (this.svg.polygon != undefined) {
+        this.svg.polygon = this.svg.createPolygone('#51ff00', this.svg.polygon.fillOpacity, `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`, '#f20707', '1', 'polygon');
+      } else {
+        this.svg.polygon = this.svg.createPolygone('#51ff00', '1', `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`, '#f20707', '1', 'polygon');
+      }
     } else if (this.svgElementType === 'circle') {
-      this.svg.circle = this.svg.createCircle('#51ff00', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '#f20707', '1', 'circle');
+      if (this.svg.circle != undefined) {
+        this.svg.circle = this.svg.createCircle('#51ff00', this.svg.circle.fillOpacity, event.offsetX.toString(), event.offsetY.toString(), '1', '#f20707', '1', 'circle');
+      } else {
+        this.svg.circle = this.svg.createCircle('#51ff00', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '#f20707', '1', 'circle');
+      }
     } else if (this.svgElementType === 'ellipse') {
-      this.svg.ellipse = this.svg.createEllipse('#51ff00', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '1', '#f20707', '1', 'ellipse', '0', '');
+      if (this.svg.ellipse != undefined) {
+        this.svg.ellipse = this.svg.createEllipse('#51ff00', this.svg.ellipse.fillOpacity, event.offsetX.toString(), event.offsetY.toString(), '1', '1', '#f20707', '1', 'ellipse', '0', '');
+      } else {
+        this.svg.ellipse = this.svg.createEllipse('#51ff00', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '1', '#f20707', '1', 'ellipse', '0', '');
+      }
     }
 
     if (this.isAddingNew === true) {
@@ -267,6 +313,7 @@ export class MainComponent implements OnInit {
         break;
       case 'rotation':
         svgElement.transform = `rotate(${target.value} ${svgElement.cx} ${svgElement.cy})`;
+        svgElement.rotate = target.value;
         break;
       case 'strokeWidth':
         svgElement.strokeWidth = target.value;
@@ -280,6 +327,10 @@ export class MainComponent implements OnInit {
 
   saveChanges(): void {
     console.log(JSON.stringify(this.svgElements));
+  }
+
+  onDragDrop(ev: Event): void {
+    console.log(ev);
   }
 }
 
