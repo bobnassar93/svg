@@ -35,18 +35,11 @@ export class MainComponent implements OnInit {
       this.showMenu = false;
     });
 
-    document.addEventListener('dragenter', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-    }, false);
-    document.addEventListener('dragleave', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-    }, false);
     document.addEventListener('dragover', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
     }, false);
+
     document.addEventListener('drop', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
@@ -97,7 +90,6 @@ export class MainComponent implements OnInit {
     }
 
     this.userStartedDrawing = true;
-    document.body.style.overflow = 'hidden';
 
     if (this.svgElementType === 'polygon') {
       this.points.push(`${event.offsetX},${event.offsetY}`);
@@ -137,6 +129,8 @@ export class MainComponent implements OnInit {
         this.svgElements.push(this.svg.ellipse);
       }
     }
+
+    document.body.style.overflow = 'hidden';
   }
 
   finishDrawingElement(): void {
