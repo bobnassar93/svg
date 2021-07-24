@@ -2,7 +2,6 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { SVG } from 'src/app/services/svg.service';
 import { ToastrService } from 'ngx-toastr';
 
-
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -34,20 +33,20 @@ export class MainComponent implements OnInit {
     target: (SVGPolygonElement | SVGCircleElement | SVGEllipseElement),
     type: string
   };
-  bootstrap!: {
-    Toast: any
-  }
 
   constructor(private svg: SVG, private toastr: ToastrService) {
   }
 
   ngOnInit(): void {
 
+    //#region Confirm Element Delete Modal Initialization
     this.deleteElementModal = document.getElementById('deleteElementPrompt')!;
     this.deleteElementModal.addEventListener('show.bs.modal', () => {
       this.showMenu = false;
     });
+    //#endregion
 
+    //#region Drag/Drop event handling
     document.addEventListener('dragover', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
@@ -59,6 +58,7 @@ export class MainComponent implements OnInit {
       let dt = ev.dataTransfer!;
       let files = dt.files;
 
+      // Listen to drop event, the user can drop an image of his choice and apply it as am SVG background, therefore he can draw svg elements on it
       let reader = new FileReader()
       reader.readAsDataURL(files[0]);
       reader.onloadend = () => {
@@ -71,8 +71,10 @@ export class MainComponent implements OnInit {
         }
       }
     }, false);
+    //#endregion
   }
 
+  // Creates the preview element after user starts drawing
   createPreviewElement(event: MouseEvent): void {
     if (this.userStartedDrawing === true) {
       // polygon
@@ -95,6 +97,7 @@ export class MainComponent implements OnInit {
     }
   }
 
+  // Add new corresponding points for either polygon, circle or ellipse 
   addNewPoints(event: MouseEvent): void {
     if (this.showMenu) {
       this.showMenu = false;
@@ -146,6 +149,7 @@ export class MainComponent implements OnInit {
     document.body.style.overflow = 'hidden';
   }
 
+  // When user double clicks, it means he finished drawing
   finishDrawingElement(): void {
     this.userStartedDrawing = false;
     this.points = [];
@@ -155,6 +159,7 @@ export class MainComponent implements OnInit {
     this.showMenu = false;
   }
 
+  // When user clicks escape to cancel drawing
   cancelDrawingElement(): void {
     if (this.userStartedDrawing === true) {
       this.svgElements.pop();
@@ -162,6 +167,7 @@ export class MainComponent implements OnInit {
     this.finishDrawingElement();
   }
 
+  // When user changes the type of element he wants to draw
   changeDrawingElement(): void {
     if (this.isAddingNew === false) {
       this.svgElements.pop();
@@ -169,6 +175,8 @@ export class MainComponent implements OnInit {
     this.finishDrawingElement();
   }
 
+  // When user wants to undo the last points of a polygon by clicking on the Backspace key
+  // if escape key pressed, it cancels drawing
   @HostListener('document:keydown', ['$event'])
   onBackKeyPress(event: KeyboardEvent): void {
     if (event.key.toLowerCase() === 'backspace') {
@@ -192,9 +200,12 @@ export class MainComponent implements OnInit {
     }
   }
 
+  // When drawing, the user can change/preview the fill-opacity of the element by using the scroll wheel on the mouse
+  // If Alt key is pressed while scrolling the wheel, it will rotate the ellipse
   @HostListener('document:wheel', ['$event'])
   onMouseWheelScroll(event: WheelEvent): void {
     if (this.userStartedDrawing === true) {
+      // Polygon
       if (this.svgElementType === 'polygon') {
         let fillOpacity = Number(this.svg.polygon.fillOpacity);
         if (Math.sign(event.deltaY) === -1) {
@@ -210,6 +221,7 @@ export class MainComponent implements OnInit {
           this.svgElements[this.svgElements.length - 1] = this.svg.polygon;
         }
       }
+      // Circle
       else if (this.svgElementType === 'circle') {
         let fillOpacity = Number(this.svg.circle.fillOpacity);
 
@@ -225,6 +237,7 @@ export class MainComponent implements OnInit {
 
         this.svgElements[this.svgElements.length - 1] = this.svg.circle;
       }
+      // Ellipse
       else if (this.svgElementType === 'ellipse') {
         let fillOpacity = Number(this.svg.ellipse.fillOpacity);
 
@@ -270,6 +283,7 @@ export class MainComponent implements OnInit {
     }
   }
 
+  // Show the context menu of the specific element
   onElementContextMenu(ev: MouseEvent, index: number): void {
     ev.preventDefault();
 
@@ -311,6 +325,7 @@ export class MainComponent implements OnInit {
     }, 50);
   }
 
+  // Event receiver from the context menu to change the element properties (ex: fill, stroke, fill-opacity etc.)
   changeElementFillColorEmitReceiver(ev: Event, property: string): void {
     const target = ev.target! as HTMLInputElement;
     const svgElement = this.svgElements[this.elementIndex];
@@ -335,6 +350,7 @@ export class MainComponent implements OnInit {
     }
   }
 
+  // Delete an element
   removeElement(): void {
     this.svgElements.splice(this.elementIndex, 1);
   }
@@ -343,9 +359,10 @@ export class MainComponent implements OnInit {
     console.log(JSON.stringify(this.svgElements));
   }
 
+  // Detect when user long-presses the left click button, indicating he wants to drag the element if the press threshold is reached
   prepareForDragging(ev: any): void {
 
-    // If not left click pressed, don't perform any action
+    // If mouse left click not pressed, don't perform any action
     if (ev.button !== 0) {
       return;
     }
@@ -368,6 +385,7 @@ export class MainComponent implements OnInit {
     }, 250);
   }
 
+  // When user releases the left mouse button, indicating he stopped dragging
   stopDragging(): void {
     if (this.startDragging === true) {
       this.startDragging = false;
@@ -378,6 +396,7 @@ export class MainComponent implements OnInit {
     clearTimeout(this.timer);
   }
 
+  // When user is dragging, we update the points of the specific element
   drag(ev: any): void {
     if (this.startDragging === false) {
       return;
@@ -418,6 +437,7 @@ export class MainComponent implements OnInit {
     }
   }
 
+  // Duplicate the specified element
   duplicateElementReceiver(): void {
 
     if (this.svgElementType === 'polygon') {
