@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { SVG } from 'src/app/services/svg.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -25,28 +26,33 @@ export class MainComponent implements OnInit {
   _url: string = '';
   _w: number = window.innerWidth;
   _h: number = window.innerHeight;
+  startingX!: number;
+  startingY!: number;
+  startDragging: boolean = false;
+  timer!: any;
+  dragElement!: {
+    target: (SVGPolygonElement | SVGCircleElement | SVGEllipseElement),
+    type: string
+  };
+  bootstrap!: {
+    Toast: any
+  }
 
-  constructor(public svg: SVG) {
+  constructor(private svg: SVG, private toastr: ToastrService) {
   }
 
   ngOnInit(): void {
+
     this.deleteElementModal = document.getElementById('deleteElementPrompt')!;
     this.deleteElementModal.addEventListener('show.bs.modal', () => {
       this.showMenu = false;
     });
 
-    document.addEventListener('dragenter', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-    }, false);
-    document.addEventListener('dragleave', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-    }, false);
     document.addEventListener('dragover', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
     }, false);
+
     document.addEventListener('drop', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
@@ -71,7 +77,6 @@ export class MainComponent implements OnInit {
     if (this.userStartedDrawing === true) {
       // polygon
       if (this.svgElementType === 'polygon') {
-
         this.svg.polygon.points = `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`;
         this.svgElements[this.svgElements.length - 1] = this.svg.polygon;
       }
@@ -97,26 +102,26 @@ export class MainComponent implements OnInit {
     }
 
     this.userStartedDrawing = true;
-    document.body.style.overflow = 'hidden';
 
     if (this.svgElementType === 'polygon') {
       this.points.push(`${event.offsetX},${event.offsetY}`);
+
       if (this.svg.polygon != undefined) {
-        this.svg.polygon = this.svg.createPolygone('#51ff00', this.svg.polygon.fillOpacity, `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`, '#f20707', '1', 'polygon');
+        this.svg.polygon = this.svg.createPolygone(this.svg.polygon.fill, this.svg.polygon.fillOpacity, `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`, this.svg.polygon.stroke, this.svg.polygon.strokeWidth, 'polygon');
       } else {
         this.svg.polygon = this.svg.createPolygone('#51ff00', '1', `${this.points.join(' ')}, ${event.offsetX},${event.offsetY}`, '#f20707', '1', 'polygon');
       }
     } else if (this.svgElementType === 'circle') {
       if (this.svg.circle != undefined) {
-        this.svg.circle = this.svg.createCircle('#51ff00', this.svg.circle.fillOpacity, event.offsetX.toString(), event.offsetY.toString(), '1', '#f20707', '1', 'circle');
+        this.svg.circle = this.svg.createCircle(this.svg.circle.fill, this.svg.circle.fillOpacity, event.offsetX.toString(), event.offsetY.toString(), '1', this.svg.circle.stroke, this.svg.circle.strokeWidth, 'circle');
       } else {
-        this.svg.circle = this.svg.createCircle('#51ff00', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '#f20707', '1', 'circle');
+        this.svg.circle = this.svg.createCircle('#51ff00', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '#f20707', '0', 'circle');
       }
     } else if (this.svgElementType === 'ellipse') {
       if (this.svg.ellipse != undefined) {
-        this.svg.ellipse = this.svg.createEllipse('#51ff00', this.svg.ellipse.fillOpacity, event.offsetX.toString(), event.offsetY.toString(), '1', '1', '#f20707', '1', 'ellipse', '0', '');
+        this.svg.ellipse = this.svg.createEllipse(this.svg.ellipse.fill, this.svg.ellipse.fillOpacity, event.offsetX.toString(), event.offsetY.toString(), this.svg.ellipse.rx, this.svg.ellipse.ry, this.svg.ellipse.stroke, this.svg.ellipse.rotate, 'ellipse', '0', '');
       } else {
-        this.svg.ellipse = this.svg.createEllipse('#51ff00', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '1', '#f20707', '1', 'ellipse', '0', '');
+        this.svg.ellipse = this.svg.createEllipse('#51ff00', '1', event.offsetX.toString(), event.offsetY.toString(), '1', '1', '#f20707', '0', 'ellipse', '0', '');
       }
     }
 
@@ -137,6 +142,8 @@ export class MainComponent implements OnInit {
         this.svgElements.push(this.svg.ellipse);
       }
     }
+
+    document.body.style.overflow = 'hidden';
   }
 
   finishDrawingElement(): void {
@@ -173,6 +180,10 @@ export class MainComponent implements OnInit {
 
         this.points.splice(this.points.length - 1, 1);
         this.svg.polygon.points = `${this.points.join(' ')}`;
+        if (this.points.length === 1) {
+          this.svg.polygon.strokeWidth = '1';
+        }
+
         this.svgElements[this.svgElements.length - 1] = this.svg.polygon;
       }
     } else if (event.key.toLowerCase() === 'escape') {
@@ -261,8 +272,10 @@ export class MainComponent implements OnInit {
 
   onElementContextMenu(ev: MouseEvent, index: number): void {
     ev.preventDefault();
+
     this.showMenu = true;
     this.elementIndex = index;
+
     setTimeout(() => {
       const innerW = window.innerWidth;
       const innerH = window.innerHeight;
@@ -290,6 +303,7 @@ export class MainComponent implements OnInit {
       this.strokeColor = this.svgElements[this.elementIndex].stroke;
       this.strokeWidth = this.svgElements[this.elementIndex].strokeWidth;
       this.type = this.svgElements[this.elementIndex].type;
+      this.svgElementType = this.type;
 
       if (this.svgElementType === 'ellipse') {
         this.rotationValue = this.svgElements[this.elementIndex].rotate;
@@ -329,8 +343,131 @@ export class MainComponent implements OnInit {
     console.log(JSON.stringify(this.svgElements));
   }
 
-  onDragDrop(ev: Event): void {
-    console.log(ev);
+  prepareForDragging(ev: any): void {
+
+    // If not left click pressed, don't perform any action
+    if (ev.button !== 0) {
+      return;
+    }
+
+    if (ev.target.tagName.toLowerCase() !== 'polygon' && ev.target.tagName.toLowerCase() !== 'ellipse' && ev.target.tagName.toLowerCase() !== 'circle') {
+      return;
+    }
+
+    this.dragElement = {
+      target: ev.target,
+      type: ev.target.tagName.toLowerCase()
+    }
+
+    this.timer = setTimeout(() => {
+      this.svg.animateCSS(ev.target as HTMLElement, 'headShake');
+      this.startingX = ev.offsetX;
+      this.startingY = ev.offsetY;
+      this.startDragging = true;
+      this.cancelDrawingElement();
+    }, 250);
+  }
+
+  stopDragging(): void {
+    if (this.startDragging === true) {
+      this.startDragging = false;
+      setTimeout(() => {
+        this.cancelDrawingElement();
+      }, 50);
+    }
+    clearTimeout(this.timer);
+  }
+
+  drag(ev: any): void {
+    if (this.startDragging === false) {
+      return;
+    }
+    let _x, _y, index;
+    index = Number(this.dragElement.target.getAttribute('data-index'))!;
+    switch (this.dragElement.type) {
+      case 'polygon':
+        this.dragElement.target = this.dragElement.target as SVGPolygonElement;
+        _x = ev.offsetX - this.startingX;
+        _y = ev.offsetY - this.startingY;
+        this.startingX = ev.offsetX;
+        this.startingY = ev.offsetY;
+
+        let newPoints: string[] = [];
+        if (this.startDragging === true) {
+
+          for (let i = 0; i < this.dragElement.target.points.length; i++) {
+            this.dragElement.target.points[i].x += _x;
+            this.dragElement.target.points[i].y += _y;
+            newPoints.push(`${this.dragElement.target.points[i].x},${this.dragElement.target.points[i].y}`);
+          }
+
+          this.svgElements[index].points = newPoints.join(' ');
+        }
+        break;
+      case 'ellipse':
+      case 'circle':
+        this.dragElement.target = this.dragElement.target as SVGEllipseElement;
+        _x = ev.offsetX - this.startingX;
+        _y = ev.offsetY - this.startingY;
+        this.startingX = ev.offsetX;
+        this.startingY = ev.offsetY;
+
+        this.svgElements[index].cx = Number(this.svgElements[index].cx) + _x;
+        this.svgElements[index].cy = Number(this.svgElements[index].cy) + _y;
+        break;
+    }
+  }
+
+  duplicateElementReceiver(): void {
+
+    if (this.svgElementType === 'polygon') {
+      this.svg.polygon = this.svg.createPolygone(
+        this.svgElements[this.elementIndex].fill,
+        this.svgElements[this.elementIndex].fillOpacity,
+        this.svgElements[this.elementIndex].points,
+        this.svgElements[this.elementIndex].stroke,
+        this.svgElements[this.elementIndex].strokeWidth,
+        this.svgElements[this.elementIndex].type
+      );
+      this.svgElements.push(this.svg.polygon);
+    }
+    // circle
+    else if (this.svgElementType === 'circle') {
+      this.svg.circle = this.svg.createCircle(
+        this.svgElements[this.elementIndex].fill,
+        this.svgElements[this.elementIndex].fillOpacity,
+        this.svgElements[this.elementIndex].cx,
+        this.svgElements[this.elementIndex].cy,
+        this.svgElements[this.elementIndex].r,
+        this.svgElements[this.elementIndex].stroke,
+        this.svgElements[this.elementIndex].strokeWidth,
+        this.svgElements[this.elementIndex].type
+      );
+      this.svgElements.push(this.svg.circle);
+    }
+    // ellipse
+    else if (this.svgElementType === 'ellipse') {
+      this.svg.ellipse = this.svg.createEllipse(
+        this.svgElements[this.elementIndex].fill,
+        this.svgElements[this.elementIndex].fillOpacity,
+        this.svgElements[this.elementIndex].cx,
+        this.svgElements[this.elementIndex].cy,
+        this.svgElements[this.elementIndex].rx,
+        this.svgElements[this.elementIndex].ry,
+        this.svgElements[this.elementIndex].stroke,
+        this.svgElements[this.elementIndex].strokeWidth,
+        this.svgElements[this.elementIndex].type,
+        this.svgElements[this.elementIndex].rotate,
+        this.svgElements[this.elementIndex].transform,
+      );
+      this.svgElements.push(this.svg.ellipse);
+    }
+
+    this.showMenu = false;
+    this.toastr.success(`${this.svgElementType.toLocaleUpperCase()} duplicated successfully!`, '', {
+      positionClass: 'toast-top-center',
+      timeOut: 1500
+    });
   }
 }
 

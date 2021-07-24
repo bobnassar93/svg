@@ -10,3 +10,9 @@ app-menu {
   height: auto;
   display: none;
 }
+
+polygon,
+ellipse,
+circle {
+  --animate-duration: 0.6s;
+}

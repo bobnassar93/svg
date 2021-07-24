@@ -20,7 +20,8 @@
 <!-- Context Menu -->
 <app-menu id="menu" *ngIf="showMenu" [type]="type" [rotation]="rotationValue" [opacity]="opacity"
     [strokeColor]="strokeColor" [strokeWidth]="strokeWidth" [fillColor]="fillColor"
-    (changeElementFillColor)="changeElementFillColorEmitReceiver($event.ev, $event.property)"></app-menu>
+    (changeElementFillColor)="changeElementFillColorEmitReceiver($event.ev, $event.property)"
+    (duplicateElement)="duplicateElementReceiver()"></app-menu>
 
 <!-- Modal -->
 <div class="modal fade" id="deleteElementPrompt" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -41,7 +42,8 @@
 </div>
 
 <!-- SVG -->
-<svg (mousemove)="createPreviewElement($event)" (click)="addNewPoints($event)" (dblclick)="finishDrawingElement()"
+<svg (mousemove)="createPreviewElement($event); drag($event)" (mousedown)="prepareForDragging($event)"
+    (mouseup)="stopDragging()" (click)="addNewPoints($event)" (dblclick)="finishDrawingElement()"
     xmlns="http://www.w3.org/2000/svg" [style]="{'background-image': 'url(' + _url + ')'}" [attr.width]="_w"
     [attr.height]="_h">
     <ng-container *ngFor="let element of svgElements; let i = index">
@@ -66,5 +68,4 @@
                 (contextmenu)="onElementContextMenu($event, i)" />
         </ng-container>
     </ng-container>
-
 </svg>
