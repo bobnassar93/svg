@@ -2,7 +2,6 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { SVG } from 'src/app/services/svg.service';
 import { ToastrService } from 'ngx-toastr';
 
-
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -59,6 +58,7 @@ export class MainComponent implements OnInit {
       let dt = ev.dataTransfer!;
       let files = dt.files;
 
+      // Listen to drop event, the user can drop an image of his choice and apply it as am SVG background, therefore he can draw svg elements on it
       let reader = new FileReader()
       reader.readAsDataURL(files[0]);
       reader.onloadend = () => {
