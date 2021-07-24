@@ -8,7 +8,10 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 export class MenuComponent implements OnInit {
 
   @Output()
-  changeElementFillColor = new EventEmitter<{ev: Event, property: string}>();
+  changeElementFillColor = new EventEmitter<{ ev: Event, property: string }>();
+
+  @Output()
+  duplicateElement = new EventEmitter();
 
   @Input()
   type: string = '';
@@ -22,14 +25,17 @@ export class MenuComponent implements OnInit {
   strokeColor!: string;
   @Input()
   strokeWidth!: string;
-  
+
   constructor() { }
 
   ngOnInit(): void {
   }
 
-  changeElementFillColorEmitter(ev: Event, property: string): void{
-    this.changeElementFillColor.emit({ev, property});
+  changeElementFillColorEmitter(ev: Event, property: string): void {
+    this.changeElementFillColor.emit({ ev, property });
   }
 
+  duplicateElementEmitter(): void {
+    this.duplicateElement.emit();
+  }
 }

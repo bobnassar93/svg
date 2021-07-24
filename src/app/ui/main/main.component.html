@@ -20,7 +20,8 @@
 <!-- Context Menu -->
 <app-menu id="menu" *ngIf="showMenu" [type]="type" [rotation]="rotationValue" [opacity]="opacity"
     [strokeColor]="strokeColor" [strokeWidth]="strokeWidth" [fillColor]="fillColor"
-    (changeElementFillColor)="changeElementFillColorEmitReceiver($event.ev, $event.property)"></app-menu>
+    (changeElementFillColor)="changeElementFillColorEmitReceiver($event.ev, $event.property)"
+    (duplicateElement)="duplicateElementReceiver()"></app-menu>
 
 <!-- Modal -->
 <div class="modal fade" id="deleteElementPrompt" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"

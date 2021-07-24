@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { SVG } from 'src/app/services/svg.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -33,11 +34,15 @@ export class MainComponent implements OnInit {
     target: (SVGPolygonElement | SVGCircleElement | SVGEllipseElement),
     type: string
   };
+  bootstrap!: {
+    Toast: any
+  }
 
-  constructor(public svg: SVG) {
+  constructor(private svg: SVG, private toastr: ToastrService) {
   }
 
   ngOnInit(): void {
+
     this.deleteElementModal = document.getElementById('deleteElementPrompt')!;
     this.deleteElementModal.addEventListener('show.bs.modal', () => {
       this.showMenu = false;
@@ -298,6 +303,7 @@ export class MainComponent implements OnInit {
       this.strokeColor = this.svgElements[this.elementIndex].stroke;
       this.strokeWidth = this.svgElements[this.elementIndex].strokeWidth;
       this.type = this.svgElements[this.elementIndex].type;
+      this.svgElementType = this.type;
 
       if (this.svgElementType === 'ellipse') {
         this.rotationValue = this.svgElements[this.elementIndex].rotate;
@@ -347,17 +353,18 @@ export class MainComponent implements OnInit {
     if (ev.target.tagName.toLowerCase() !== 'polygon' && ev.target.tagName.toLowerCase() !== 'ellipse' && ev.target.tagName.toLowerCase() !== 'circle') {
       return;
     }
+
     this.dragElement = {
       target: ev.target,
       type: ev.target.tagName.toLowerCase()
     }
 
     this.timer = setTimeout(() => {
+      this.svg.animateCSS(ev.target as HTMLElement, 'headShake');
       this.startingX = ev.offsetX;
       this.startingY = ev.offsetY;
       this.startDragging = true;
       this.cancelDrawingElement();
-      this.svg.animateCSS(ev.target as HTMLElement, 'flash');
     }, 250);
   }
 
@@ -409,6 +416,58 @@ export class MainComponent implements OnInit {
         this.svgElements[index].cy = Number(this.svgElements[index].cy) + _y;
         break;
     }
+  }
+
+  duplicateElementReceiver(): void {
+
+    if (this.svgElementType === 'polygon') {
+      this.svg.polygon = this.svg.createPolygone(
+        this.svgElements[this.elementIndex].fill,
+        this.svgElements[this.elementIndex].fillOpacity,
+        this.svgElements[this.elementIndex].points,
+        this.svgElements[this.elementIndex].stroke,
+        this.svgElements[this.elementIndex].strokeWidth,
+        this.svgElements[this.elementIndex].type
+      );
+      this.svgElements.push(this.svg.polygon);
+    }
+    // circle
+    else if (this.svgElementType === 'circle') {
+      this.svg.circle = this.svg.createCircle(
+        this.svgElements[this.elementIndex].fill,
+        this.svgElements[this.elementIndex].fillOpacity,
+        this.svgElements[this.elementIndex].cx,
+        this.svgElements[this.elementIndex].cy,
+        this.svgElements[this.elementIndex].r,
+        this.svgElements[this.elementIndex].stroke,
+        this.svgElements[this.elementIndex].strokeWidth,
+        this.svgElements[this.elementIndex].type
+      );
+      this.svgElements.push(this.svg.circle);
+    }
+    // ellipse
+    else if (this.svgElementType === 'ellipse') {
+      this.svg.ellipse = this.svg.createEllipse(
+        this.svgElements[this.elementIndex].fill,
+        this.svgElements[this.elementIndex].fillOpacity,
+        this.svgElements[this.elementIndex].cx,
+        this.svgElements[this.elementIndex].cy,
+        this.svgElements[this.elementIndex].rx,
+        this.svgElements[this.elementIndex].ry,
+        this.svgElements[this.elementIndex].stroke,
+        this.svgElements[this.elementIndex].strokeWidth,
+        this.svgElements[this.elementIndex].type,
+        this.svgElements[this.elementIndex].rotate,
+        this.svgElements[this.elementIndex].transform,
+      );
+      this.svgElements.push(this.svg.ellipse);
+    }
+
+    this.showMenu = false;
+    this.toastr.success(`${this.svgElementType.toLocaleUpperCase()} duplicated successfully!`, '', {
+      positionClass: 'toast-top-center',
+      timeOut: 1500
+    });
   }
 }
 
