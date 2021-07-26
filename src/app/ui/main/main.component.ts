@@ -97,7 +97,7 @@ export class MainComponent implements OnInit {
     }
   }
 
-  // Add new corresponding points for either polygon, circle or ellipse 
+  // Add new corresponding points for either polygon, circle or ellipse
   addNewPoints(event: MouseEvent): void {
     if (this.showMenu) {
       this.showMenu = false;
@@ -423,7 +423,6 @@ export class MainComponent implements OnInit {
           this.svgElements[index].points = newPoints.join(' ');
         }
         break;
-      case 'ellipse':
       case 'circle':
         this.dragElement.target = this.dragElement.target as SVGEllipseElement;
         _x = ev.offsetX - this.startingX;
@@ -433,6 +432,17 @@ export class MainComponent implements OnInit {
 
         this.svgElements[index].cx = Number(this.svgElements[index].cx) + _x;
         this.svgElements[index].cy = Number(this.svgElements[index].cy) + _y;
+        break;
+        case 'ellipse':
+        this.dragElement.target = this.dragElement.target as SVGEllipseElement;
+        _x = ev.offsetX - this.startingX;
+        _y = ev.offsetY - this.startingY;
+        this.startingX = ev.offsetX;
+        this.startingY = ev.offsetY;
+
+        this.svgElements[index].cx = Number(this.svgElements[index].cx) + _x;
+        this.svgElements[index].cy = Number(this.svgElements[index].cy) + _y;
+        this.svgElements[index].transform = `rotate(${this.svgElements[index].rotate} ${this.svgElements[index].cx} ${this.svgElements[index].cy})`;
         break;
     }
   }
