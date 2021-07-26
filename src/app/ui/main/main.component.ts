@@ -433,7 +433,7 @@ export class MainComponent implements OnInit {
         this.svgElements[index].cx = Number(this.svgElements[index].cx) + _x;
         this.svgElements[index].cy = Number(this.svgElements[index].cy) + _y;
         break;
-      case 'ellipse':
+        case 'ellipse':
         this.dragElement.target = this.dragElement.target as SVGEllipseElement;
         _x = ev.offsetX - this.startingX;
         _y = ev.offsetY - this.startingY;
