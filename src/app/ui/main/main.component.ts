@@ -362,6 +362,11 @@ export class MainComponent implements OnInit {
   // Detect when user long-presses the left click button, indicating he wants to drag the element if the press threshold is reached
   prepareForDragging(ev: any): void {
 
+    // Check if user is adding a new shape ignore the drag listener
+    if (this.userStartedDrawing === true) {
+      return;
+    }
+
     // If mouse left click not pressed, don't perform any action
     if (ev.button !== 0) {
       return;
@@ -382,7 +387,7 @@ export class MainComponent implements OnInit {
       this.startingY = ev.offsetY;
       this.startDragging = true;
       this.cancelDrawingElement();
-    }, 250);
+    }, 300);
   }
 
   // When user releases the left mouse button, indicating he stopped dragging
