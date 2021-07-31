@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { SVG } from 'src/app/services/svg.service';
 import { ToastrService } from 'ngx-toastr';
+import { ICircle, IEllipse, IPolygon } from 'src/app/interfaces/svg-interfaces';
 
 @Component({
   selector: 'app-main',
@@ -326,7 +327,7 @@ export class MainComponent implements OnInit {
   }
 
   // Event receiver from the context menu to change the element properties (ex: fill, stroke, fill-opacity etc.)
-  changeElementFillColorEmitReceiver(ev: Event, property: string): void {
+  changeElementPropertiesEmitReceiver(ev: Event, property: string): void {
     const target = ev.target! as HTMLInputElement;
     const svgElement = this.svgElements[this.elementIndex];
 
@@ -382,7 +383,7 @@ export class MainComponent implements OnInit {
     }
 
     this.timer = setTimeout(() => {
-      this.svg.animateCSS(ev.target as HTMLElement, 'headShake');
+      this.svg.animateCSS(ev.target as HTMLElement, 'flash');
       this.startingX = ev.offsetX;
       this.startingY = ev.offsetY;
       this.startDragging = true;
@@ -504,5 +505,48 @@ export class MainComponent implements OnInit {
       timeOut: 1500
     });
   }
-}
 
+  prepareElementForResizing(element: (IPolygon | ICircle | IEllipse)): void {
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', (ev: KeyboardEvent) => {
+      switch (ev.key.toLowerCase()) {
+        case 'arrowup':
+          if (element.type === 'circle') {
+            element = element as ICircle;
+            element.r = (Number(element.r) + 1).toString();
+          } else if (element.type === 'ellipse') {
+            element = element as IEllipse;
+            element.ry = (Number(element.ry) + 1).toString();
+          }
+          break;
+        case 'arrowright':
+          if (element.type === 'circle') {
+            element = element as ICircle;
+            element.r = (Number(element.r) + 1).toString();
+          } else if (element.type === 'ellipse') {
+            element = element as IEllipse;
+            element.rx = (Number(element.rx) + 1).toString();
+          }
+          break;
+        case 'arrowdown':
+          if (element.type === 'circle') {
+            element = element as ICircle;
+            element.r = (Number(element.r) - 1).toString();
+          } else if (element.type === 'ellipse') {
+            element = element as IEllipse;
+            element.ry = (Number(element.ry) - 1).toString();
+          }
+          break;
+        case 'arrowleft':
+          if (element.type === 'circle') {
+            element = element as ICircle;
+            element.r = (Number(element.r) - 1).toString();
+          } else if (element.type === 'ellipse') {
+            element = element as IEllipse;
+            element.rx = (Number(element.rx) - 1).toString();
+          }
+          break;
+      }
+    }, false);
+  }
+}

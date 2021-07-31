@@ -14,13 +14,17 @@
             type="radio" name="inlineRadioOptions" value="ellipse" id="ellipse">
         <label class="form-check-label pointer" for="ellipse">Ellipse</label>
     </div>
+    <div class="form-check form-switch d-inline-block">
+        <input class="form-check-input pointer" type="checkbox" id="editMode">
+        <label class="form-check-label pointer" for="editMode">Edit Mode</label>
+    </div>
     <button class="btn btn-outline-success m-1" (click)="saveChanges()">Save</button>
 </div>
 
 <!-- Context Menu -->
 <app-menu id="menu" *ngIf="showMenu" [type]="type" [rotation]="rotationValue" [opacity]="opacity"
     [strokeColor]="strokeColor" [strokeWidth]="strokeWidth" [fillColor]="fillColor"
-    (changeElementFillColor)="changeElementFillColorEmitReceiver($event.ev, $event.property)"
+    (changeElementProperties)="changeElementPropertiesEmitReceiver($event.ev, $event.property)"
     (duplicateElement)="duplicateElementReceiver()"></app-menu>
 
 <!-- Modal -->

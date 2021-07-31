@@ -8,7 +8,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 export class MenuComponent implements OnInit {
 
   @Output()
-  changeElementFillColor = new EventEmitter<{ ev: Event, property: string }>();
+  changeElementProperties = new EventEmitter<{ ev: Event, property: string }>();
 
   @Output()
   duplicateElement = new EventEmitter();
@@ -31,8 +31,8 @@ export class MenuComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  changeElementFillColorEmitter(ev: Event, property: string): void {
-    this.changeElementFillColor.emit({ ev, property });
+  changeElementPropertiesEmitter(ev: Event, property: string): void {
+    this.changeElementProperties.emit({ ev, property });
   }
 
   duplicateElementEmitter(): void {
