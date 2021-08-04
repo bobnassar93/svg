@@ -14,16 +14,12 @@
             type="radio" name="inlineRadioOptions" value="ellipse" id="ellipse">
         <label class="form-check-label pointer" for="ellipse">Ellipse</label>
     </div>
-    <div class="form-check form-switch d-inline-block">
-        <input class="form-check-input pointer" type="checkbox" id="editMode">
-        <label class="form-check-label pointer" for="editMode">Edit Mode</label>
-    </div>
     <button class="btn btn-outline-success m-1" (click)="saveChanges()">Save</button>
 </div>
 
 <!-- Context Menu -->
 <app-menu id="menu" *ngIf="showMenu" [type]="type" [rotation]="rotationValue" [opacity]="opacity"
-    [strokeColor]="strokeColor" [strokeWidth]="strokeWidth" [fillColor]="fillColor"
+    [strokeColor]="strokeColor" [strokeWidth]="strokeWidth" [fillColor]="fillColor" [rx]="rx" [ry]="ry" [r]="r"
     (changeElementProperties)="changeElementPropertiesEmitReceiver($event.ev, $event.property)"
     (duplicateElement)="duplicateElementReceiver()"></app-menu>
 
@@ -56,7 +52,7 @@
             <polygon *ngSwitchCase="'polygon'" [attr.points]="element.points" [attr.fill]="element.fill"
                 [attr.stroke]="element.stroke" [attr.stroke-width]="element.strokeWidth"
                 [attr.fill-opacity]="element.fillOpacity" [attr.data-index]="i"
-                (contextmenu)="onElementContextMenu($event, i)" />
+                (contextmenu)="onElementContextMenu($event, i)" (mousemove)="detectPolygonEdges()" />
 
             <!-- Circle -->
             <circle *ngSwitchCase="'circle'" [attr.cx]="element.cx" [attr.cy]="element.cy" [attr.r]="element.r"

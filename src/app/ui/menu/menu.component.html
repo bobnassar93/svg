@@ -29,15 +29,26 @@
         <input type="range" min="0" max="360" step="1" class="form-range" id="rotation"
             (input)="changeElementPropertiesEmitter($event, 'rotation')" [(ngModel)]="rotation">
     </li>
-    <li class="dropdown-item" *ngIf="type === 'ellipse'">
-        <div class="row">
+    <li class="dropdown-item pb-3" *ngIf="type === 'ellipse'">
+        <div class="row g-3">
             <div class="col-6">
                 <label for="rx" class="form-label">X axix</label>
-                <input type="number" class="form-control" id="rx" placeholder="X axix">
+                <input type="number" class="form-control" id="rx" placeholder="X axix" [(ngModel)]="rx"
+                    (input)="changeElementPropertiesEmitter($event, 'rx')">
             </div>
             <div class="col-6">
                 <label for="ry" class="form-label">Y axis</label>
-                <input type="number" class="form-control" id="ry" placeholder="Y axis">
+                <input type="number" class="form-control" id="ry" placeholder="Y axis" [(ngModel)]="ry"
+                    (input)="changeElementPropertiesEmitter($event, 'ry')">
+            </div>
+        </div>
+    </li>
+    <li class="dropdown-item pb-3" *ngIf="type === 'circle'">
+        <div class="row g-3">
+            <div class="col-12">
+                <label for="r" class="form-label">Radius</label>
+                <input type="number" class="form-control" id="r" placeholder="Radius" [(ngModel)]="r"
+                    (input)="changeElementPropertiesEmitter($event, 'r')">
             </div>
         </div>
     </li>

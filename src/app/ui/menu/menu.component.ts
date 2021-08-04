@@ -25,6 +25,12 @@ export class MenuComponent implements OnInit {
   strokeColor!: string;
   @Input()
   strokeWidth!: string;
+  @Input()
+  r!: string;
+  @Input()
+  rx!: string;
+  @Input()
+  ry!: string;
 
   constructor() { }
 

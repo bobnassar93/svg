@@ -22,6 +22,9 @@ export class MainComponent implements OnInit {
   opacity!: string;
   strokeColor!: string;
   strokeWidth!: string;
+  r!: string;
+  rx!: string;
+  ry!: string;
   type!: string;
   _url: string = '';
   _w: number = window.innerWidth;
@@ -284,6 +287,12 @@ export class MainComponent implements OnInit {
     }
   }
 
+  @HostListener('window:resize')
+  resizeSVG(): void {
+    this._w = window.innerWidth;
+    this._h = window.innerHeight;
+  }
+
   // Show the context menu of the specific element
   onElementContextMenu(ev: MouseEvent, index: number): void {
     ev.preventDefault();
@@ -295,16 +304,30 @@ export class MainComponent implements OnInit {
       const innerW = window.innerWidth;
       const innerH = window.innerHeight;
       const menu = document.querySelector('#menu')! as HTMLElement;
+      const ul = document.querySelector('.dropdown-menu')! as HTMLUListElement;
+
       menu.style.display = 'block';
+      menu.style.height = 'auto';
+      ul.style.height = 'auto';
 
       if (((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth)) && ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight))) {
+        if (ev.pageY < menu.firstElementChild!.clientHeight) {
+          menu.style.height = (ev.pageY - 20).toString() + 'px';
+          ul.style.height = (ev.pageY - 20).toString() + 'px';
+        }
+
         menu.style.top = `${ev.pageY - menu.firstElementChild!.clientHeight}px`;
         menu.style.left = `${ev.pageX - menu.firstElementChild!.clientWidth}px`;
       }
       else if ((innerW - ev.pageX) <= (menu.firstElementChild!.clientWidth)) {
         menu.style.top = `${ev.pageY}px`;
         menu.style.left = `${ev.pageX - menu.firstElementChild!.clientWidth}px`;
-      } else if ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight)) {
+      }
+      else if ((innerH - ev.pageY) <= (menu.firstElementChild!.clientHeight)) {
+        if (ev.pageY < menu.firstElementChild!.clientHeight) {
+          menu.style.height = (ev.pageY - 20).toString() + 'px';
+          ul.style.height = (ev.pageY - 20).toString() + 'px';
+        }
         menu.style.top = `${ev.pageY - menu.firstElementChild!.clientHeight}px`;
         menu.style.left = `${ev.pageX}px`;
       }
@@ -322,6 +345,10 @@ export class MainComponent implements OnInit {
 
       if (this.svgElementType === 'ellipse') {
         this.rotationValue = this.svgElements[this.elementIndex].rotate;
+        this.rx = this.svgElements[this.elementIndex].rx;
+        this.ry = this.svgElements[this.elementIndex].ry;
+      } else if (this.svgElementType === 'circle') {
+        this.r = this.svgElements[this.elementIndex].r;
       }
     }, 50);
   }
@@ -347,6 +374,15 @@ export class MainComponent implements OnInit {
         break;
       case 'strokeWidth':
         svgElement.strokeWidth = target.value;
+        break;
+      case 'r':
+        svgElement.r = target.value;
+        break;
+      case 'rx':
+        svgElement.rx = target.value;
+        break;
+      case 'ry':
+        svgElement.ry = target.value;
         break;
     }
   }
@@ -548,5 +584,9 @@ export class MainComponent implements OnInit {
           break;
       }
     }, false);
+  }
+
+  detectPolygonEdges(): void {
+
   }
 }
